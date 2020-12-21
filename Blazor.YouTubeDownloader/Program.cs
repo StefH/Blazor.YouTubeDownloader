@@ -40,11 +40,14 @@ namespace Blazor.YouTubeDownloader
 
             string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
             Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(httpClientBaseAddress) });
+            // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(httpClientBaseAddress) });
 
             builder.Services.AddScoped(sp =>
             {
-                var httpClient = sp.GetService<HttpClient>();
+                var httpClient = new HttpClient
+                {
+                    BaseAddress = new Uri(httpClientBaseAddress)
+                };
                 return new RestClient(httpClient).For<IYouTubeDownloadApi>();
             });
 

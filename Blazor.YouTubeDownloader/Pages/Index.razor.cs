@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
+using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Pages
 {
@@ -24,8 +25,12 @@ namespace Blazor.YouTubeDownloader.Pages
 
             try
             {
-                var x = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
-                int y = 0;
+                var audioOnlyStreamInfos = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
+                
+                // Highest bitrate audio-only stream
+                var streamInfo = audioOnlyStreamInfos.WithHighestBitrate();
+
+                int x = 9;
             }
             catch (Exception ex)
             {
