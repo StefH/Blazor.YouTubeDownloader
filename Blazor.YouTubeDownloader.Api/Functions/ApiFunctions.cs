@@ -22,9 +22,9 @@ namespace Blazor.YouTubeDownloader.Api.Functions
         }
 
         [FunctionName("GetAudioOnlyStreams")]
-        public async Task<IActionResult> GetAudioOnlyStreams([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        public async Task<IActionResult> GetAudioOnlyStreamsAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
         {
-            _logger.LogInformation("HttpTrigger - GetGetAudioOnlyStreamsAsync");
+            _logger.LogInformation("HttpTrigger - GetAudioOnlyStreamsAsync");
 
             string url = req.Query["YouTubeUrl"].Single();
 
