@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
 
@@ -7,6 +8,9 @@ namespace Blazor.YouTubeDownloader.Pages
 {
     public partial class Index
     {
+        [Inject]
+        public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
+
         [Inject]
         public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
         
@@ -20,6 +24,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
             try
             {
+                var x = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
                 int y = 0;
             }
             catch (Exception ex)

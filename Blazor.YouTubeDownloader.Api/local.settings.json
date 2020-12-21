@@ -1,0 +1,8 @@
+{
+  "IsEncrypted": false,
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information"
+    }
+  }
+}

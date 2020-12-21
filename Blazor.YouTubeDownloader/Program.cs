@@ -1,13 +1,14 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using YoutubeExplode;
+using RestEase;
 
 namespace Blazor.YouTubeDownloader
 {
@@ -27,11 +28,25 @@ namespace Blazor.YouTubeDownloader
                 .AddFontAwesomeIcons()
                 .AddBlazorDownloadFile();
 
-            builder.Services.AddScoped(sp => new HttpClient
+            // HttpClient
+            var baseAddress = builder.HostEnvironment.BaseAddress;
+            Console.WriteLine("HostEnvironment.BaseAddress = " + baseAddress);
+
+            bool isLocalHost = baseAddress.Contains("localhost");
+            Console.WriteLine("isLocalHost = " + isLocalHost);
+
+            bool isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youttubedownloader.heyenrath.nl");
+            Console.WriteLine("isAzure = " + isAzure);
+
+            string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/api" : baseAddress;
+            Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
+            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(httpClientBaseAddress) });
+
+            builder.Services.AddScoped(sp =>
             {
-                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+                var httpClient = sp.GetService<HttpClient>();
+                return new RestClient(httpClient).For<IYouTubeDownloadApi>();
             });
-            builder.Services.AddScoped<YoutubeClient>();
 
             var host = builder.Build();
 
