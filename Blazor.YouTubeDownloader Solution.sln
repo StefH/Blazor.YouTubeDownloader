@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29521.150
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{33997DC9-84AA-47E3-BEB5-C418065DC503}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{42E32377-5505-45FD-81C2-5BAAE2058B79}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.YouTubeDownloader", "Blazor.YouTubeDownloader\Blazor.YouTubeDownloader.csproj", "{A2960BD5-83B9-4898-B5C2-4B69EDA0504B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StreamExtensions", "StreamExtensions\StreamExtensions.csproj", "{A7A5BFB7-9A7D-4447-8599-94552FC5C386}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YoutubeExplodeConsoleApp", "YoutubeExplodeConsoleApp\YoutubeExplodeConsoleApp.csproj", "{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A2960BD5-83B9-4898-B5C2-4B69EDA0504B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2960BD5-83B9-4898-B5C2-4B69EDA0504B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2960BD5-83B9-4898-B5C2-4B69EDA0504B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2960BD5-83B9-4898-B5C2-4B69EDA0504B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7A5BFB7-9A7D-4447-8599-94552FC5C386}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7A5BFB7-9A7D-4447-8599-94552FC5C386}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7A5BFB7-9A7D-4447-8599-94552FC5C386}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7A5BFB7-9A7D-4447-8599-94552FC5C386}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A2960BD5-83B9-4898-B5C2-4B69EDA0504B} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
+		{A7A5BFB7-9A7D-4447-8599-94552FC5C386} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
+		{DE85BC53-F9D0-48DD-A34C-056C40AEFF8C} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {95736335-0C8B-4FDA-8722-E08046339B83}
+	EndGlobalSection
+EndGlobal

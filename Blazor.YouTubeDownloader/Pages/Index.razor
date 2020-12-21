@@ -1,0 +1,23 @@
+﻿@page "/"
+
+<Card>
+    <CardHeader>
+        <CardTitle>Settings</CardTitle>
+    </CardHeader>
+    <CardBody>
+        <b>General</b>
+        <Divider />
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">YouTube Video Url</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <TextEdit @bind-Text="@YouTubeUrl" />
+                <FieldHelp>YouTube Video Url</FieldHelp>
+            </FieldBody>
+            <FieldBody>
+                <Tooltip Text="Process YouTube Video Url (download manifest).">
+                    <Button Color="Color.Primary" Disabled="@(!ProcessYouTubeUrlButtonEnabled)" Clicked="@ProcessYouTubeUrlAsync">Process</Button>
+                </Tooltip>
+            </FieldBody>
+        </Field>
+    </CardBody>
+</Card>
