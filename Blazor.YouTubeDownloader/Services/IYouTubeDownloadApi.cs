@@ -5,6 +5,7 @@ using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Services
 {
+    [BasePath("api")]
     public interface IYouTubeDownloadApi
     {
         [Get("GetAudioOnlyStreams")]
