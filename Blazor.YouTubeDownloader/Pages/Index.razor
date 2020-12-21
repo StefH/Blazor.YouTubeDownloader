@@ -5,8 +5,6 @@
         <CardTitle>Settings</CardTitle>
     </CardHeader>
     <CardBody>
-        <b>General</b>
-        <Divider />
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is3">YouTube Video Url</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is4">
@@ -19,5 +17,40 @@
                 </Tooltip>
             </FieldBody>
         </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <RadioGroup TValue="AudioOnlyStreamInfo" Name="colors" CheckedValue="@CheckedAudioOnlyStreamInfo" CheckedValueChanged="@OnCheckedValueChanged">
+                    @foreach (var info in AudioOnlyStreamInfos)
+                    {
+                        <Radio TValue="AudioOnlyStreamInfo" Value="@info">@info.GetTitle()</Radio>
+                    }
+                </RadioGroup>
+            </FieldBody>
+        </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
+            @*<FieldBody ColumnSize="ColumnSize.Is4">
+                    <TextEdit @bind-Text="@YouTubeUrl" />
+                    <FieldHelp>YouTube Video Url</FieldHelp>
+                </FieldBody>*@
+            <FieldBody>
+                <Tooltip Text="Download Audio">
+                    <!-- Disabled="@(!DownloadButtonEnabled)"-->
+                    <Button Color="Color.Primary" Clicked="@DownloadFileAsync">Download</Button>
+                </Tooltip>
+            </FieldBody>
+        </Field>
+
+        @*<Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is3">Progress</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="@($"width: {DownloadProgress}%")" aria-valuenow="@DownloadProgress" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </FieldBody>
+            </Field>*@
     </CardBody>
 </Card>

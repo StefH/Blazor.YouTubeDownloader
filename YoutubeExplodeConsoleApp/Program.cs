@@ -33,7 +33,13 @@ namespace YoutubeExplodeConsoleApp
 
                 await using var destinationStream = File.OpenWrite("T:\\Eh0N0Edlpng." + streamInfo.Container.Name);
 
-                await stream.CopyToAsync(destinationStream, progress1);
+                await stream.CopyToAsync(destinationStream, async p =>
+                {
+                    var x = (int) (p.TotalBytesCopied / (double) p.SourceLength * 100);
+                    Console.WriteLine(x);
+
+                    //await Task.CompletedTask;
+                });
 
                 // Download the stream to file
                 var progress2 = new Progress<double>();

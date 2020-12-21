@@ -18,7 +18,7 @@ namespace System.IO
         /// <param name="sourceLength">The length of the source stream, if known - used for progress reporting.</param>
         /// <param name="destination">The <see cref="Stream"/> to which the contents of the current stream will be copied.</param>
         /// <param name="bufferSize">The size, in bytes, of the buffer. This value must be greater than zero. The default size is 81920.</param>
-        /// <param name="progress">An <see cref="IProgress{T}"/> implementation for reporting progress.</param>
+        /// <param name="progress">An async function for reporting progress.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is None.</param>
         /// <returns>A task representing the operation</returns>
         public static async Task CopyToAsync(
@@ -26,7 +26,8 @@ namespace System.IO
             long sourceLength,
             Stream destination,
             int bufferSize,
-            IProgress<FileCopyProgressInfo> progress,
+            Func<FileCopyProgressInfo, Task> progress,
+            //IProgress<FileCopyProgressInfo> progress,
             CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -81,7 +82,9 @@ namespace System.IO
 
                 totalBytesCopied += bytesRead;
 
-                progress.Report(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
+                await progress(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
+
+                //progress.Report(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
             }
         }
 
@@ -91,20 +94,31 @@ namespace System.IO
         /// <param name="source">The source <see cref="Stream"/> to copy from.</param>
         /// <param name="sourceLength">The length of the source stream, if known - used for progress reporting.</param>
         /// <param name="destination">The <see cref="Stream"/> to which the contents of the current stream will be copied.</param>
-        /// <param name="progress">An <see cref="IProgress{T}"/> implementation for reporting progress.</param>
+        /// <param name="progress">An async function for reporting progress.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is None.</param>
         /// <returns>A task representing the operation</returns>
-        public static Task CopyToAsync(this Stream source, long sourceLength, Stream destination, IProgress<FileCopyProgressInfo> progress, CancellationToken cancellationToken = default)
-            => CopyToAsync(source, sourceLength, destination, DefaultBufferSize, progress, cancellationToken);
+        public static Task CopyToAsync(
+            this Stream source,
+            long sourceLength,
+            Stream destination,
+            //IProgress<FileCopyProgressInfo> progress,
+            Func<FileCopyProgressInfo, Task> progress,
+            CancellationToken cancellationToken = default
+        ) => CopyToAsync(source, sourceLength, destination, DefaultBufferSize, progress, cancellationToken);
 
         /// <summary>
         /// Copies a stream to another stream
         /// </summary>
         /// <param name="source">The source <see cref="Stream"/> to copy from</param>
         /// <param name="destination">The <see cref="Stream"/> to which the contents of the current stream will be copied.</param>
-        /// <param name="progress">An <see cref="IProgress{T}"/> implementation for reporting progress.</param>
+        /// <param name="progress">An async function for reporting progress.</param>
         /// <param name="cancellationToken">The token to monitor for cancellation requests. The default value is None.</param>
-        public static Task CopyToAsync(this Stream source, Stream destination, IProgress<FileCopyProgressInfo> progress, CancellationToken cancellationToken = default)
-            => CopyToAsync(source, 0L, destination, DefaultBufferSize, progress, cancellationToken);
+        public static Task CopyToAsync(
+            this Stream source,
+            Stream destination,
+            //IProgress<FileCopyProgressInfo> progress,
+            Func<FileCopyProgressInfo, Task> progress,
+            CancellationToken cancellationToken = default
+        ) => CopyToAsync(source, 0L, destination, DefaultBufferSize, progress, cancellationToken);
     }
 }

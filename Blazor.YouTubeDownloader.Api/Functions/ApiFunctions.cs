@@ -1,4 +1,6 @@
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Api.Models;
 using Microsoft.AspNetCore.Http;
@@ -7,6 +9,7 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Api.Functions
 {
@@ -33,6 +36,16 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             var audioStreams = manifest.GetAudioOnly();
 
             return new SystemTextJsonResult(audioStreams);
+        }
+
+        [FunctionName("GetStream")]
+        public async Task<Stream> GetStream([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetStream");
+
+            var streamInfo = await JsonSerializer.DeserializeAsync<IStreamInfo>(req.Body);
+
+            return await _client.Videos.Streams.GetAsync(streamInfo);
         }
     }
 }
