@@ -14,6 +14,7 @@ namespace Blazor.YouTubeDownloader.Pages
     public partial class Index
     {
         private static int NoSelection = -1;
+        private static string AudioCodecOpus = "opus";
 
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
@@ -78,7 +79,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
         {
-            string extension = streamInfo.AudioCodec == "opus" ? "opus" : streamInfo.Container.Name;
+            string extension = streamInfo.AudioCodec == AudioCodecOpus ? AudioCodecOpus : streamInfo.Container.Name;
 
             string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{extension}";
 
