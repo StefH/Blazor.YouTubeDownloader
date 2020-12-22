@@ -8,7 +8,10 @@ namespace Blazor.YouTubeDownloader.Api.Services
     {
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
-            Converters = { new ImmutableConverter() }
+            Converters =
+            {
+                new ImmutableConverter() // https://github.com/dotnet/runtime/issues/29895
+            }
         };
 
         public ValueTask<T?> DeserializeAsync<T>(Stream stream) where T : class
