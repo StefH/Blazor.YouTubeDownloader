@@ -28,7 +28,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
 
-        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround
+        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround for https://github.com/stsrki/Blazorise/issues/1635
 
         public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
 
@@ -80,7 +80,6 @@ namespace Blazor.YouTubeDownloader.Pages
         private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
         {
             string extension = streamInfo.AudioCodec == AudioCodecOpus ? AudioCodecOpus : streamInfo.Container.Name;
-
             string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{extension}";
 
             return (name, MimeTypeMap.GetMimeType(extension));
