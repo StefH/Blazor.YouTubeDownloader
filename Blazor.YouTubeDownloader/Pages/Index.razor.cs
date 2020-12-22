@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Threading.Tasks;
+using System.Web;
 using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
@@ -17,7 +16,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         [Inject]
         public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-        
+
         public bool ProcessYouTubeUrlButtonEnabled = true;
 
         public bool DownloadButtonEnabled;
@@ -25,8 +24,6 @@ namespace Blazor.YouTubeDownloader.Pages
         public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
 
         public AudioOnlyStreamInfo? CheckedAudioOnlyStreamInfo;
-
-        public int DownloadProgress = 77;
 
         public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
 
@@ -40,16 +37,17 @@ namespace Blazor.YouTubeDownloader.Pages
             try
             {
                 AudioOnlyStreamInfos = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
+                CheckedAudioOnlyStreamInfo = (AudioOnlyStreamInfo?)AudioOnlyStreamInfos.WithHighestBitrate();
             }
             finally
             {
+                DownloadButtonEnabled = true;
                 ProcessYouTubeUrlButtonEnabled = true;
             }
         }
 
         void OnCheckedValueChanged(AudioOnlyStreamInfo value)
         {
-            DownloadButtonEnabled = true;
             StateHasChanged();
         }
 
@@ -60,14 +58,18 @@ namespace Blazor.YouTubeDownloader.Pages
                 return;
             }
 
+            DownloadButtonEnabled = false;
+
             try
             {
                 var stream = await YouTubeDownloadApi.GetStreamAsync(CheckedAudioOnlyStreamInfo);
-                await BlazorDownloadFileService.DownloadFile(Path.GetFileNameWithoutExtension(YouTubeUrl), stream);
+
+                string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{CheckedAudioOnlyStreamInfo.Container.Name}";
+                await BlazorDownloadFileService.DownloadFile(name, stream);
             }
             finally
             {
-                ProcessYouTubeUrlButtonEnabled = true;
+                DownloadButtonEnabled = true;
             }
         }
     }

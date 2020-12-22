@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Net.Http;
 using Blazor.YouTubeDownloader.Api;
+using Blazor.YouTubeDownloader.Api.Services;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,8 @@ namespace Blazor.YouTubeDownloader.Api
                 var httpClient = new HttpClient();
                 return new YoutubeClient(httpClient);
             });
+
+            builder.Services.AddSingleton<ISerializer, Serializer>();
         }
     }
 }

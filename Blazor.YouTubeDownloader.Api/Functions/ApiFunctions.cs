@@ -1,8 +1,8 @@
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Api.Models;
+using Blazor.YouTubeDownloader.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -13,15 +13,17 @@ using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Api.Functions
 {
-    public class ApiFunctions
+    internal class ApiFunctions
     {
         private readonly ILogger<ApiFunctions> _logger;
         private readonly YoutubeClient _client;
+        private readonly ISerializer _serializer;
 
-        public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client)
+        public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, ISerializer serializer)
         {
             _logger = logger;
             _client = client;
+            _serializer = serializer;
         }
 
         [FunctionName("GetAudioOnlyStreams")]
@@ -38,12 +40,12 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             return new SystemTextJsonResult(audioStreams);
         }
 
-        [FunctionName("GetStream")]
-        public async Task<Stream> GetStream([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        [FunctionName("GetAudioStream")]
+        public async Task<Stream> GetAudioStreamAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
         {
-            _logger.LogInformation("HttpTrigger - GetStream");
+            _logger.LogInformation("HttpTrigger - GetAudioStreamAsync");
 
-            var streamInfo = await JsonSerializer.DeserializeAsync<IStreamInfo>(req.Body);
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
             return await _client.Videos.Streams.GetAsync(streamInfo);
         }

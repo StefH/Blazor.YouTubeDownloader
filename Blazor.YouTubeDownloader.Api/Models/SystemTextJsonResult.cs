@@ -7,7 +7,7 @@ namespace Blazor.YouTubeDownloader.Api.Models
     {
         private const string ContentTypeApplicationJson = "application/json";
 
-        public SystemTextJsonResult(object value, JsonSerializerOptions options = null)
+        public SystemTextJsonResult(object value, JsonSerializerOptions? options = null)
         {
             ContentType = ContentTypeApplicationJson;
             Content = options == null ? JsonSerializer.Serialize(value) : JsonSerializer.Serialize(value, options);
