@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using Blazor.YouTubeDownloader.Services;
@@ -11,6 +12,8 @@ namespace Blazor.YouTubeDownloader.Pages
 {
     public partial class Index
     {
+        private static int NoSelection = -1;
+
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
 
@@ -23,21 +26,23 @@ namespace Blazor.YouTubeDownloader.Pages
 
         public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
 
-        public AudioOnlyStreamInfo? CheckedAudioOnlyStreamInfo;
+        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround
 
         public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
 
         async Task ProcessYouTubeUrlAsync()
         {
             AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
-            CheckedAudioOnlyStreamInfo = null;
+            CheckedAudioOnlyStreamInfoHashCode = NoSelection;
             ProcessYouTubeUrlButtonEnabled = false;
             DownloadButtonEnabled = false;
 
             try
             {
                 AudioOnlyStreamInfos = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
-                CheckedAudioOnlyStreamInfo = (AudioOnlyStreamInfo?)AudioOnlyStreamInfos.WithHighestBitrate();
+
+                var highest = AudioOnlyStreamInfos.WithHighestBitrate();
+                CheckedAudioOnlyStreamInfoHashCode = highest != null ? highest.GetHashCode() : NoSelection;
             }
             finally
             {
@@ -46,14 +51,9 @@ namespace Blazor.YouTubeDownloader.Pages
             }
         }
 
-        void OnCheckedValueChanged(AudioOnlyStreamInfo value)
-        {
-            StateHasChanged();
-        }
-
         async Task DownloadFileAsync()
         {
-            if (CheckedAudioOnlyStreamInfo == null)
+            if (CheckedAudioOnlyStreamInfoHashCode == NoSelection)
             {
                 return;
             }
@@ -62,9 +62,10 @@ namespace Blazor.YouTubeDownloader.Pages
 
             try
             {
-                var stream = await YouTubeDownloadApi.GetStreamAsync(CheckedAudioOnlyStreamInfo);
+                var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
+                var stream = await YouTubeDownloadApi.GetStreamAsync(streamInfo);
 
-                string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{CheckedAudioOnlyStreamInfo.Container.Name}";
+                string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{streamInfo.Container.Name}";
                 await BlazorDownloadFileService.DownloadFile(name, stream);
             }
             finally

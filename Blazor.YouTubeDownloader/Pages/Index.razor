@@ -2,7 +2,7 @@
 
 <Card>
     <CardHeader>
-        <CardTitle>Settings</CardTitle>
+        <CardTitle>YouTube Audio Downloader</CardTitle>
     </CardHeader>
     <CardBody>
         <Field Horizontal="true">
@@ -20,10 +20,11 @@
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is4">
-                <RadioGroup TValue="AudioOnlyStreamInfo" Name="colors" CheckedValue="@CheckedAudioOnlyStreamInfo" CheckedValueChanged="@OnCheckedValueChanged">
+                <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
                     @foreach (var info in AudioOnlyStreamInfos)
                     {
-<Radio TValue="AudioOnlyStreamInfo" Value="@info">@info.GetTitle()</Radio>}
+                        <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
+                    }
                 </RadioGroup>
             </FieldBody>
         </Field>
