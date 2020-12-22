@@ -6,6 +6,7 @@ using System.Web;
 using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
+using MimeTypes;
 using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Pages
@@ -65,13 +66,23 @@ namespace Blazor.YouTubeDownloader.Pages
                 var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
                 var stream = await YouTubeDownloadApi.GetStreamAsync(streamInfo);
 
-                string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{streamInfo.Container.Name}";
-                await BlazorDownloadFileService.DownloadFile(name, stream);
+                var (filename, contentType) = GetFilenameWithContentType(streamInfo);
+
+                await BlazorDownloadFileService.DownloadFile(filename, stream, contentType);
             }
             finally
             {
                 DownloadButtonEnabled = true;
             }
+        }
+
+        private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
+        {
+            string extension = streamInfo.AudioCodec == "opus" ? "opus" : streamInfo.Container.Name;
+
+            string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{extension}";
+
+            return (name, MimeTypeMap.GetMimeType(extension));
         }
     }
 }

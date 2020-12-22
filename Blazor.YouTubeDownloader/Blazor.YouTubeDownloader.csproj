@@ -16,4 +16,8 @@
     <PackageReference Include="YoutubeExplode" Version="5.1.9" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
