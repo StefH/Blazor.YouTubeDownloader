@@ -19,14 +19,7 @@ namespace Blazor.YouTubeDownloader
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
 
-            builder.Services
-                .AddBlazorise(options =>
-                {
-                    options.ChangeTextOnKeyPress = true;
-                })
-                .AddBootstrapProviders()
-                .AddFontAwesomeIcons()
-                .AddBlazorDownloadFile();
+
 
             // HttpClient
             var baseAddress = builder.HostEnvironment.BaseAddress;
@@ -40,16 +33,28 @@ namespace Blazor.YouTubeDownloader
 
             string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
             Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
-            // builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(httpClientBaseAddress) });
 
-            builder.Services.AddScoped(sp =>
-            {
-                var httpClient = new HttpClient
+            builder.Services
+                // Blazorise
+                .AddBlazorise(options =>
                 {
-                    BaseAddress = new Uri(httpClientBaseAddress)
-                };
-                return new RestClient(httpClient).For<IYouTubeDownloadApi>();
-            });
+                    options.ChangeTextOnKeyPress = true;
+                })
+                .AddBootstrapProviders()
+                .AddFontAwesomeIcons()
+
+                // BlazorDownloadFile
+                .AddBlazorDownloadFile()
+
+                // Own services
+                .AddScoped(sp =>
+                {
+                    var httpClient = new HttpClient
+                    {
+                        BaseAddress = new Uri(httpClientBaseAddress)
+                    };
+                    return new RestClient(httpClient).For<IYouTubeDownloadApi>();
+                });
 
             var host = builder.Build();
 
