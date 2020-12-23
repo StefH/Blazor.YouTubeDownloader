@@ -12,30 +12,42 @@
             </FieldBody>
             <FieldBody>
                 <Tooltip Text="Process YouTube Video Url (download manifest).">
-                    <Button Color="Color.Primary" Disabled="@(!ProcessYouTubeUrlButtonEnabled)" Clicked="@ProcessYouTubeUrlAsync">Process</Button>
-                </Tooltip>
-            </FieldBody>
-        </Field>
-
-        <Field Horizontal="true">
-            <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
-            <FieldBody ColumnSize="ColumnSize.Is4">
-                <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
-                    @foreach (var info in AudioOnlyStreamInfos)
-                    {
-                        <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
-                    }
-                </RadioGroup>
-            </FieldBody>
-        </Field>
-
-        <Field Horizontal="true">
-            <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
-            <FieldBody>
-                <Tooltip Text="Download Audio File">
-                    <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
+                    <Button Color="Color.Primary" Disabled="@(!ProcessYouTubeUrlButtonEnabled)" Loading="@(!ProcessYouTubeUrlButtonEnabled)" Clicked="@ProcessYouTubeUrlAsync">Process</Button>
                 </Tooltip>
             </FieldBody>
         </Field>
     </CardBody>
+
+    @if (VideoMetaData != null)
+    {
+        <CardBody>
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is3">Title</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <Label>@VideoMetaData.Title</Label>
+                </FieldBody>
+            </Field>
+
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
+                        @foreach (var info in AudioOnlyStreamInfos)
+                        {
+                            <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
+                        }
+                    </RadioGroup>
+                </FieldBody>
+            </Field>
+
+            <Field Horizontal="true">
+                <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
+                <FieldBody ColumnSize="ColumnSize.Is4">
+                    <Tooltip Text="Download Audio File">
+                        <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Loading="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
+                    </Tooltip>
+                </FieldBody>
+            </Field>
+        </CardBody>
+    }
 </Card>

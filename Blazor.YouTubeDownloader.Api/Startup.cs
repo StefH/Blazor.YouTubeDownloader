@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Net.Http;
+using System.Text.Json.Extensions.Services;
 using Blazor.YouTubeDownloader.Api;
-using Blazor.YouTubeDownloader.Api.Services;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;

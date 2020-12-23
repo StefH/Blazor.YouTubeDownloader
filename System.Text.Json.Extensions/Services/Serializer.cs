@@ -1,18 +1,23 @@
 ﻿using System.IO;
-using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Blazor.YouTubeDownloader.Api.Services
+namespace System.Text.Json.Extensions.Services
 {
-    internal class Serializer : ISerializer
+    public class Serializer : ISerializer
     {
         private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
             Converters =
             {
-                new ImmutableConverter() // https://github.com/dotnet/runtime/issues/29895
+                new JsonTimeSpanConverter(),
+                new ImmutableConverter()
             }
         };
+
+        public string Serialize(object value)
+        {
+            return JsonSerializer.Serialize(value, _jsonSerializerOptions);
+        }
 
         public ValueTask<T?> DeserializeAsync<T>(Stream stream) where T : class
         {

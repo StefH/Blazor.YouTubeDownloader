@@ -1,8 +1,9 @@
 using System.IO;
 using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Extensions.Services;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Api.Models;
-using Blazor.YouTubeDownloader.Api.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -26,6 +27,18 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             _serializer = serializer;
         }
 
+        [FunctionName("GetVideoMetaData")]
+        public async Task<IActionResult> GetVideoMetaDataAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetVideoMetaDataAsync");
+
+            string url = req.Query["YouTubeUrl"].Single();
+
+            var videoMetaData = await _client.Videos.GetAsync(url);
+            
+            return new SystemTextJsonResult(videoMetaData, new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
+        }
+
         [FunctionName("GetAudioOnlyStreams")]
         public async Task<IActionResult> GetAudioOnlyStreamsAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
         {
@@ -37,7 +50,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var audioStreams = manifest.GetAudioOnly();
 
-            return new SystemTextJsonResult(audioStreams);
+            return new SystemTextJsonResult(audioStreams, new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
         }
 
         [FunctionName("GetAudioStream")]

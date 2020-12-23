@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
 using MimeTypes;
+using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Pages
@@ -23,8 +26,10 @@ namespace Blazor.YouTubeDownloader.Pages
         public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
         public bool ProcessYouTubeUrlButtonEnabled = true;
-
+                
         public bool DownloadButtonEnabled;
+
+        public Video? VideoMetaData;
 
         public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
 
@@ -34,6 +39,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         async Task ProcessYouTubeUrlAsync()
         {
+            VideoMetaData = null;
             AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
             CheckedAudioOnlyStreamInfoHashCode = NoSelection;
             ProcessYouTubeUrlButtonEnabled = false;
@@ -41,6 +47,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
             try
             {
+                VideoMetaData = await YouTubeDownloadApi.GetVideoMetaDataAsync(YouTubeUrl);
                 AudioOnlyStreamInfos = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
 
                 var highest = AudioOnlyStreamInfos.WithHighestBitrate();
@@ -80,9 +87,15 @@ namespace Blazor.YouTubeDownloader.Pages
         private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
         {
             string extension = streamInfo.AudioCodec == AudioCodecOpus ? AudioCodecOpus : streamInfo.Container.Name;
-            string name = $"{HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"]}.{extension}";
 
-            return (name, MimeTypeMap.GetMimeType(extension));
+            string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
+
+            return ($"{fileName}.{extension}", MimeTypeMap.GetMimeType(extension));
+        }
+
+        private static string GetSafeFileName(string fileName)
+        {
+            return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
         }
     }
 }

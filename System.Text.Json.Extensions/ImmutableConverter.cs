@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Extensions.Services;
 using System.Text.Json.Serialization;
 
 namespace System.Text.Json
 {
+    // https://github.com/dotnet/runtime/issues/29895
     public class ImmutableConverter : JsonConverter<object>
     {
         public override bool CanConvert(Type typeToConvert)
@@ -26,8 +28,7 @@ namespace System.Text.Json
                     result = true;
                     foreach (var parameter in parameters)
                     {
-                        var hasMatchingProperty = properties.Any(p =>
-                            NameOfPropertyAndParameter.Matches(p.Name, parameter.Name));
+                        var hasMatchingProperty = properties.Any(p => NameOfPropertyAndParameter.Matches(p.Name, parameter.Name));
                         if (!hasMatchingProperty)
                         {
                             result = false;
@@ -76,19 +77,25 @@ namespace System.Text.Json
             for (var index = 0; index < parameters.Length; index++)
             {
                 var parameterInfo = parameters[index];
-                var value = valueOfProperty.First(prop =>
-                    NameOfPropertyAndParameter.Matches(prop.Key.Name, parameterInfo.Name)).Value;
+                var value = valueOfProperty.First(prop => NameOfPropertyAndParameter.Matches(prop.Key.Name, parameterInfo.Name)).Value;
 
                 parameterValues[index] = value;
             }
 
-            var instance = ctor.Invoke(parameterValues);
-            return instance;
+            return ctor.Invoke(parameterValues);
         }
 
         public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
         {
-            throw new NotImplementedException();
+            var newOptions = TinyMapperUtils.Instance.Map(options);
+            newOptions.Converters.Clear();
+
+            foreach (var c in options.Converters.Where(c => !(c is ImmutableConverter)))
+            {
+                newOptions.Converters.Add(c);
+            }
+
+            JsonSerializer.Serialize(writer, value, newOptions);
         }
 
         private static PropertyInfo[] GetProperties(IReflect typeToConvert)

@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
+    <ProjectReference Include="..\System.Text.Json.Extensions\System.Text.Json.Extensions.csproj" />
   </ItemGroup>
 
   <ItemGroup>
