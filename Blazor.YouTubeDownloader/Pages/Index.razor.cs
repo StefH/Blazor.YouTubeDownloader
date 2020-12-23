@@ -9,6 +9,7 @@ using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
 using Microsoft.AspNetCore.Components;
 using MimeTypes;
+using YoutubeExplode;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -72,7 +73,8 @@ namespace Blazor.YouTubeDownloader.Pages
             try
             {
                 var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
-                var stream = await YouTubeDownloadApi.GetStreamAsync(streamInfo);
+
+                var stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
 
                 var (filename, contentType) = GetFilenameWithContentType(streamInfo);
 

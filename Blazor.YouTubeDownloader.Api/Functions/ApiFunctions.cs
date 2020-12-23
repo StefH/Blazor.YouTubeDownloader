@@ -50,7 +50,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var audioStreams = manifest.GetAudioOnly();
 
-            return new SystemTextJsonResult(audioStreams, new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
+            return new SystemTextJsonResult(audioStreams);
         }
 
         [FunctionName("GetAudioStream")]
