@@ -48,7 +48,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var manifest = await _client.Videos.Streams.GetManifestAsync(url);
 
-            var audioStreams = manifest.GetAudioOnly();
+            var audioStreams = manifest.GetAudioOnly().OrderBy(a => a.Bitrate);
 
             return new SystemTextJsonResult(audioStreams);
         }
