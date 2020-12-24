@@ -4,21 +4,21 @@ using System.Threading.Tasks;
 // ReSharper disable once CheckNamespace
 namespace System.IO
 {
-    public struct FileCopyProgressInfo
-    {
-        public long BytesRead { get; set; }
-
-        public long TotalBytesCopied { get; set; }
-
-        public long SourceLength { get; set; }
-    }
-
     /// <summary>
     /// Provides CopyToAsync method for operating on <see cref="Stream"/> instances.
     /// </summary>
 	public static class StreamExtensions
     {
         private const int DefaultBufferSize = 81920;
+
+        public static async Task<int> CopyBufferedToAsync(this Stream source, Stream destination, byte[] buffer,
+            CancellationToken cancellationToken = default)
+        {
+            var bytesCopied = await source.ReadAsync(buffer, cancellationToken);
+            await destination.WriteAsync(buffer, 0, bytesCopied, cancellationToken);
+
+            return bytesCopied;
+        }
 
         /// <summary>
         /// Asynchronously reads the bytes from the current stream and writes them to another stream, using a specified buffer size and cancellation token.
@@ -144,7 +144,6 @@ namespace System.IO
             Stream destination,
             int bufferSize,
             Func<FileCopyProgressInfo, Task> progress,
-            //IProgress<FileCopyProgressInfo> progress,
             CancellationToken cancellationToken = default)
         {
             if (source == null)
@@ -186,23 +185,36 @@ namespace System.IO
 
             var totalBytesCopied = 0L;
             int bytesRead;
-            var buffer = new byte[bufferSize];
+            // var buffer = new byte[bufferSize];
 
-            while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+            using var buffer = PooledBuffer.ForStream(bufferSize);
+
+            // var totalBytesCopied = 0L;
+            int bytesCopied;
+            do
             {
-                if (bytesRead == 0 || cancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
+                bytesCopied = await source.CopyBufferedToAsync(destination, buffer.Array, cancellationToken);
+                totalBytesCopied += bytesCopied;
 
-                await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+                await progress(new FileCopyProgressInfo { BytesRead = bytesCopied, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
 
-                totalBytesCopied += bytesRead;
+                // progress?.Report(1.0 * totalBytesCopied / source.Length);
+            } while (bytesCopied > 0);
 
-                await progress(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
 
-                //progress.Report(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
-            }
+            //while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
+            //{
+            //    if (bytesRead == 0 || cancellationToken.IsCancellationRequested)
+            //    {
+            //        break;
+            //    }
+
+            //    await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
+
+            //    totalBytesCopied += bytesRead;
+
+            //    await progress(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
+            //}
         }
 
         /// <summary>
@@ -218,7 +230,6 @@ namespace System.IO
             this Stream source,
             long sourceLength,
             Stream destination,
-            //IProgress<FileCopyProgressInfo> progress,
             Func<FileCopyProgressInfo, Task> progress,
             CancellationToken cancellationToken = default
         ) => CopyToAsync(source, sourceLength, destination, DefaultBufferSize, progress, cancellationToken);
@@ -233,7 +244,6 @@ namespace System.IO
         public static Task CopyToAsync(
             this Stream source,
             Stream destination,
-            //IProgress<FileCopyProgressInfo> progress,
             Func<FileCopyProgressInfo, Task> progress,
             CancellationToken cancellationToken = default
         ) => CopyToAsync(source, 0L, destination, DefaultBufferSize, progress, cancellationToken);

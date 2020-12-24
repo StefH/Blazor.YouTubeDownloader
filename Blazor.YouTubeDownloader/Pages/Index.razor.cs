@@ -92,6 +92,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 var x = new Stopwatch();
 
+                x.Reset();
                 x.Start();
                 var data = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
                 x.Stop();
@@ -115,6 +116,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 //};
 
+                x.Reset();
                 x.Start();
                 using var ms = new MemoryStream();
 
@@ -128,12 +130,14 @@ namespace Blazor.YouTubeDownloader.Pages
                 x.Stop();
                 Console.WriteLine("CopyToAsync = " + x.Elapsed);
 
+                x.Reset();
                 x.Start();
                 var array = ms.ToArray();
                 x.Stop();
 
                 Console.WriteLine("ToArray = " + x.Elapsed);
 
+                x.Reset();
                 x.Start();
                 await DownloadAsync(filename, contentType, array);
                 x.Stop();
