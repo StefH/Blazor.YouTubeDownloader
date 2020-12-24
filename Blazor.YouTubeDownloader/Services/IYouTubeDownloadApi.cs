@@ -18,5 +18,8 @@ namespace Blazor.YouTubeDownloader.Services
 
         [Post("GetAudioStream")]
         public Task<Stream> GetAudioStreamAsync([Body] AudioOnlyStreamInfo streamInfo);
+
+        [Post("GetAudioBytes")]
+        public Task<byte[]> GetAudioBytesAsync([Body] AudioOnlyStreamInfo streamInfo);
     }
 }

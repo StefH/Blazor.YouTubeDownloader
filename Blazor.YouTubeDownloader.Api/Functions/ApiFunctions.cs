@@ -62,5 +62,19 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             return await _client.Videos.Streams.GetAsync(streamInfo);
         }
+
+        [FunctionName("GetAudioBytes")]
+        public async Task<byte[]> GetAudioBytesAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
+
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+
+            using var destinationStream = new MemoryStream();
+
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+
+            return destinationStream.ToArray();
+        }
     }
 }

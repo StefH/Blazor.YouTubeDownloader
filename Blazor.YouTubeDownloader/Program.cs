@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Services;
 using BlazorDownloadFile;
+using BlazorFileSaver;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
@@ -18,8 +19,6 @@ namespace Blazor.YouTubeDownloader
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
-
-
 
             // HttpClient
             var baseAddress = builder.HostEnvironment.BaseAddress;
@@ -45,6 +44,7 @@ namespace Blazor.YouTubeDownloader
 
                 // BlazorDownloadFile
                 .AddBlazorDownloadFile()
+                .AddBlazorFileSaver()
 
                 // Own services
                 .AddScoped(sp =>
