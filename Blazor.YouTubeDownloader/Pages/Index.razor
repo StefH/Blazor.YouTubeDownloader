@@ -49,13 +49,15 @@
             <Field Horizontal="true">
                 <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
                 <FieldBody ColumnSize="ColumnSize.Is4">
-                    <Tooltip Text="Download Audio File">
-                        <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Loading="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
-                    </Tooltip>
+                    <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Loading="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
+
+                    <div style="margin-top: 10px;">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="@($"width: {@Progress}%")" aria-valuenow="@Progress" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
                 </FieldBody>
             </Field>
-
-            <TextEdit @bind-Text="@Progress" />
         </CardBody>
     }
 </Card>

@@ -8,8 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Blazor.YouTubeDownloader.Services;
-using BlazorDownloadFile;
-using BlazorFileSaver;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MimeTypes;
@@ -24,16 +22,16 @@ namespace Blazor.YouTubeDownloader.Pages
         private static string AudioCodecOpus = "opus";
 
         [Inject]
-        public IJSRuntime js { get; set; }
+        public IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
 
-        [Inject]
-        public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
+        //[Inject]
+        //public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
-        [Inject]
-        private IBlazorFileSaver BlazorFileSaver { get; set; }
+        //[Inject]
+        //private IBlazorFileSaver BlazorFileSaver { get; set; }
 
         public bool ProcessYouTubeUrlButtonEnabled = true;
 
@@ -47,7 +45,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
 
-        public string Progress = "";
+        public long Progress;
 
         async Task ProcessYouTubeUrlAsync()
         {
@@ -56,6 +54,7 @@ namespace Blazor.YouTubeDownloader.Pages
             CheckedAudioOnlyStreamInfoHashCode = NoSelection;
             ProcessYouTubeUrlButtonEnabled = false;
             DownloadButtonEnabled = false;
+            Progress = 0;
 
             try
             {
@@ -66,9 +65,6 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 VideoMetaData = await taskVideoMetaData;
                 AudioOnlyStreamInfos = await taskAudioOnlyStreamInfos;
-
-                //VideoMetaData = await YouTubeDownloadApi.GetVideoMetaDataAsync(YouTubeUrl);
-                //AudioOnlyStreamInfos = await YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
 
                 var highest = AudioOnlyStreamInfos.WithHighestBitrate();
                 CheckedAudioOnlyStreamInfoHashCode = highest != null ? highest.GetHashCode() : NoSelection;
@@ -87,7 +83,7 @@ namespace Blazor.YouTubeDownloader.Pages
                 return;
             }
 
-            Progress = "";
+            Progress = 0;
             DownloadButtonEnabled = false;
 
             try
@@ -95,82 +91,54 @@ namespace Blazor.YouTubeDownloader.Pages
                 var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
 
                 var x = new Stopwatch();
-                x.Start();
 
+                x.Start();
                 var data = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
-                // var data = await YouTubeDownloadApi.GetAudioBytesAsync(streamInfo);
+                x.Stop();
+
+                Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
 
                 var (filename, contentType) = GetFilenameWithContentType(streamInfo);
 
-                var p = new Progress<FileCopyProgressInfo>();
+                //var p = new Progress<FileCopyProgressInfo>();
 
-                p.ProgressChanged += (object? sender, FileCopyProgressInfo e) =>
-                {
-                    InvokeAsync(() =>
-                    {
-                        Progress = $"{100 * e.TotalBytesCopied / e.SourceLength}%";
+                //p.ProgressChanged += (object? sender, FileCopyProgressInfo e) =>
+                //{
+                //    InvokeAsync(() =>
+                //    {
+                //        Progress = 100 * e.TotalBytesCopied / e.SourceLength;
 
-                        StateHasChanged();
-                        Console.WriteLine(Progress);
-                        Task.Delay(1);  // give the UI some time to catch up
-                    });
+                //        StateHasChanged();
+                //        Console.WriteLine(Progress);
+                //        Task.Delay(1);  // give the UI some time to catch up
+                //    });
 
-                };
+                //};
 
-                //await BlazorDownloadFileService.DownloadFile(filename, data, 3276800, p, contentType);
-
+                x.Start();
                 using var ms = new MemoryStream();
 
-                //await data.CopyToAsync(ms, p);
+                await data.CopyToAsync(ms, async (e) =>
+                {
+                    Progress = 100 * e.TotalBytesCopied / e.SourceLength;
 
-                //await InvokeAsync(async () =>
-                //{
-                    await data.CopyToAsync(ms, async (e) =>
-                    {
-                        Progress = $"{100 * e.TotalBytesCopied / e.SourceLength}%";
-
-                        StateHasChanged();
-                        await Task.Delay(5); // give the UI some time to catch up
-
-                        //await InvokeAsync(async () =>
-                        //{
-                        //    Progress = $"{100 * e.TotalBytesCopied / e.SourceLength}%";
-
-                        //    //StateHasChanged();
-                        //    InvokeAsync(() => StateHasChanged());
-                        //    Console.WriteLine(Progress);
-                        //});
-                    });
-                //});
-
-
+                    StateHasChanged();
+                    await Task.Delay(1); // give the UI some time to catch up
+                });
                 x.Stop();
-
-                Console.WriteLine(x.Elapsed);
+                Console.WriteLine("CopyToAsync = " + x.Elapsed);
 
                 x.Start();
                 var array = ms.ToArray();
-                // var b = Convert.ToBase64String(array);
                 x.Stop();
 
                 Console.WriteLine("ToArray = " + x.Elapsed);
 
-                //    var b = await data.ToByteArrayAsync();
-
                 x.Start();
-
-                //await BlazorFileSaver.SaveAsBase64(filename, b, contentType);
-
-                //await js.InvokeVoidAsync("saveAsFile", filename, contentType, b);
-
-                // await BlazorDownloadFileService.DownloadFile(filename, b, contentType);
-
                 await DownloadAsync(filename, contentType, array);
-
                 x.Stop();
 
                 Console.WriteLine("Download = " + x.Elapsed);
-
             }
             finally
             {
@@ -181,7 +149,7 @@ namespace Blazor.YouTubeDownloader.Pages
         public async Task DownloadAsync(string fileName, string contentType, byte[] file)
         {
             // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
-            if (js is IJSUnmarshalledRuntime webAssemblyJSRuntime)
+            if (JSRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
             {
                 Console.WriteLine("Using BlazorDownloadFileFast");
                 webAssemblyJSRuntime.InvokeUnmarshalled<string, string, byte[], bool>("BlazorDownloadFileFast", fileName, contentType, file);
@@ -190,7 +158,7 @@ namespace Blazor.YouTubeDownloader.Pages
             {
                 // Fall back to the slow method if not in WebAssembly
                 Console.WriteLine("Using BlazorDownloadFile");
-                await js.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
+                await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
             }
         }
 
