@@ -13,6 +13,6 @@ namespace System.IO
 
     internal static class PooledBuffer
     {
-        public static PooledBuffer<byte> ForStream(int length = 81920) => new(length);
+        public static PooledBuffer<byte> ForStream(int length = 81920) => new PooledBuffer<byte>(length);
     }
 }
