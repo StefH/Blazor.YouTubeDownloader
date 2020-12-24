@@ -19,8 +19,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blazor.YouTubeDownloader.Sh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "System.Text.Json.Extensions", "System.Text.Json.Extensions\System.Text.Json.Extensions.csproj", "{5988734D-63BA-43BD-9B5D-192EBA485DED}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorDownloadFile", "BlazorDownloadFile\BlazorDownloadFile.csproj", "{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,10 +41,6 @@ Global
 		{5988734D-63BA-43BD-9B5D-192EBA485DED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5988734D-63BA-43BD-9B5D-192EBA485DED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5988734D-63BA-43BD-9B5D-192EBA485DED}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,7 +50,6 @@ Global
 		{661B07BB-DA42-47EC-BA48-EBAA57BECB31} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
 		{90A8DBD7-4230-46E7-BD89-0B972B42A924} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
 		{5988734D-63BA-43BD-9B5D-192EBA485DED} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
-		{D5BC8755-D6E8-4117-A1F3-A71809CE2EAB} = {33997DC9-84AA-47E3-BEB5-C418065DC503}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95736335-0C8B-4FDA-8722-E08046339B83}

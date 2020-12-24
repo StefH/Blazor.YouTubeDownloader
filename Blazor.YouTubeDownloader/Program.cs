@@ -2,8 +2,6 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Services;
-using BlazorDownloadFile;
-using BlazorFileSaver;
 using Blazorise;
 using Blazorise.Bootstrap;
 using Blazorise.Icons.FontAwesome;
@@ -43,8 +41,6 @@ namespace Blazor.YouTubeDownloader
                 .AddFontAwesomeIcons()
 
                 // BlazorDownloadFile
-                .AddBlazorDownloadFile()
-                .AddBlazorFileSaver()
 
                 // Own services
                 .AddScoped(sp =>

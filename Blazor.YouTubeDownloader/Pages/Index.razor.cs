@@ -27,12 +27,6 @@ namespace Blazor.YouTubeDownloader.Pages
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
 
-        //[Inject]
-        //public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-
-        //[Inject]
-        //private IBlazorFileSaver BlazorFileSaver { get; set; }
-
         public bool ProcessYouTubeUrlButtonEnabled = true;
 
         public bool DownloadButtonEnabled;
@@ -94,45 +88,35 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 x.Reset();
                 x.Start();
-                var data = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
+                var stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
                 x.Stop();
 
                 Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
 
                 var (filename, contentType) = GetFilenameWithContentType(streamInfo);
 
-                //var p = new Progress<FileCopyProgressInfo>();
-
-                //p.ProgressChanged += (object? sender, FileCopyProgressInfo e) =>
-                //{
-                //    InvokeAsync(() =>
-                //    {
-                //        Progress = 100 * e.TotalBytesCopied / e.SourceLength;
-
-                //        StateHasChanged();
-                //        Console.WriteLine(Progress);
-                //        Task.Delay(1);  // give the UI some time to catch up
-                //    });
-
-                //};
-
                 x.Reset();
                 x.Start();
-                using var ms = new MemoryStream();
+                using var memoryStream = new MemoryStream();
 
-                await data.CopyToAsync(ms, async (e) =>
+                long lastValue = 0;
+                await stream.CopyToAsync(memoryStream, async (e) =>
                 {
                     Progress = 100 * e.TotalBytesCopied / e.SourceLength;
-
-                    StateHasChanged();
-                    await Task.Delay(1); // give the UI some time to catch up
+                    
+                    if (Progress != lastValue)
+                    {
+                        lastValue = Progress;
+                        StateHasChanged();
+                        await Task.Delay(1); // give the UI some time to catch up
+                    }
                 });
                 x.Stop();
                 Console.WriteLine("CopyToAsync = " + x.Elapsed);
 
                 x.Reset();
                 x.Start();
-                var array = ms.ToArray();
+                var array = memoryStream.ToArray();
                 x.Stop();
 
                 Console.WriteLine("ToArray = " + x.Elapsed);

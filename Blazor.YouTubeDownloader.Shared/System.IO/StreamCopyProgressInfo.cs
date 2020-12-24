@@ -1,6 +1,6 @@
 ﻿namespace System.IO
 {
-    public struct FileCopyProgressInfo
+    public struct StreamCopyProgressInfo
     {
         public long BytesRead { get; set; }
 
