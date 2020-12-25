@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
+using Blazor.DownloadFile.Interfaces;
 using Blazor.YouTubeDownloader.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -21,11 +22,14 @@ namespace Blazor.YouTubeDownloader.Pages
         private static int NoSelection = -1;
         private static string AudioCodecOpus = "opus";
 
-        [Inject]
-        public IJSRuntime JSRuntime { get; set; }
+        //[Inject]
+        //public IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
+
+        [Inject]
+        public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
         public bool ProcessYouTubeUrlButtonEnabled = true;
 
@@ -102,7 +106,7 @@ namespace Blazor.YouTubeDownloader.Pages
                 long lastValue = 0;
                 await stream.CopyToAsync(memoryStream, async (e) =>
                 {
-                    Progress = 100 * e.TotalBytesCopied / e.SourceLength;
+                    Progress = 100 * e.TotalBytesRead / e.SourceLength;
                     
                     if (Progress != lastValue)
                     {
@@ -123,7 +127,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 x.Reset();
                 x.Start();
-                await DownloadAsync(filename, contentType, array);
+                await BlazorDownloadFileService.DownloadAsync(filename, array, contentType);
                 x.Stop();
 
                 Console.WriteLine("Download = " + x.Elapsed);
@@ -134,21 +138,21 @@ namespace Blazor.YouTubeDownloader.Pages
             }
         }
 
-        public async Task DownloadAsync(string fileName, string contentType, byte[] file)
-        {
-            // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
-            if (JSRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
-            {
-                Console.WriteLine("Using BlazorDownloadFileFast");
-                webAssemblyJSRuntime.InvokeUnmarshalled<string, string, byte[], bool>("BlazorDownloadFileFast", fileName, contentType, file);
-            }
-            else
-            {
-                // Fall back to the slow method if not in WebAssembly
-                Console.WriteLine("Using BlazorDownloadFile");
-                await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
-            }
-        }
+        //public async Task DownloadAsync(string fileName, byte[] file, string contentType)
+        //{
+        //    // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
+        //    if (JSRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
+        //    {
+        //        Console.WriteLine("Using BlazorDownloadFileFast");
+        //        webAssemblyJSRuntime.InvokeUnmarshalled<string, string, byte[], bool>("BlazorDownloadFileFast", fileName, contentType, file);
+        //    }
+        //    else
+        //    {
+        //        // Fall back to the slow method if not in WebAssembly
+        //        Console.WriteLine("Using BlazorDownloadFile");
+        //        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
+        //    }
+        //}
 
         private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
         {

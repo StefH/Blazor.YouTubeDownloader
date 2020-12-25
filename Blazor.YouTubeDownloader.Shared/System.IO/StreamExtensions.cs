@@ -91,7 +91,7 @@ namespace System.IO
 
                 //await progress(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
 
-                progress.Report(new StreamCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
+                progress.Report(new StreamCopyProgressInfo { BytesRead = bytesRead, TotalBytesRead = totalBytesCopied, SourceLength = sourceLength });
             }
         }
 
@@ -182,38 +182,17 @@ namespace System.IO
                 sourceLength = source.Length - source.Position;
             }
 
-            var totalBytesCopied = 0L;
-            int bytesRead;
-            // var buffer = new byte[bufferSize];
-
             using var buffer = PooledBuffer.ForStream(bufferSize);
 
-            // var totalBytesCopied = 0L;
-            int bytesCopied;
+            long totalBytesCopied = 0L;
+            int bytesRead;
             do
             {
-                bytesCopied = await source.CopyBufferedToAsync(destination, buffer.Array, cancellationToken);
-                totalBytesCopied += bytesCopied;
+                bytesRead = await source.CopyBufferedToAsync(destination, buffer.Array, cancellationToken);
+                totalBytesCopied += bytesRead;
 
-                await progress(new StreamCopyProgressInfo { BytesRead = bytesCopied, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
-
-                // progress?.Report(1.0 * totalBytesCopied / source.Length);
-            } while (bytesCopied > 0);
-
-
-            //while ((bytesRead = await source.ReadAsync(buffer, 0, buffer.Length, cancellationToken).ConfigureAwait(false)) != 0)
-            //{
-            //    if (bytesRead == 0 || cancellationToken.IsCancellationRequested)
-            //    {
-            //        break;
-            //    }
-
-            //    await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken).ConfigureAwait(false);
-
-            //    totalBytesCopied += bytesRead;
-
-            //    await progress(new FileCopyProgressInfo { BytesRead = bytesRead, TotalBytesCopied = totalBytesCopied, SourceLength = sourceLength });
-            //}
+                await progress(new StreamCopyProgressInfo { BytesRead = bytesRead, TotalBytesRead = totalBytesCopied, SourceLength = sourceLength });
+            } while (!cancellationToken.IsCancellationRequested && bytesRead > 0);
         }
 
         /// <summary>

@@ -1,22 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Blazor.DownloadFile.Interfaces;
+using Blazor.DownloadFile.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.JSInterop;
 
-namespace BlazorDownloadFile
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
         /// <summary>
         /// Registers blazor download file service
         /// </summary>
-        /// <param name="services"></param>
-        /// <param name="lifetime"></param>
-        /// <returns></returns>
         public static IServiceCollection AddBlazorDownloadFile(this IServiceCollection services, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            return ServiceCollectionDescriptorExtensions.Add(services, 
-                new ServiceDescriptor(typeof(IBlazorDownloadFileService), 
-                sp => new BlazorDownloadFileService(sp.GetRequiredService<IJSRuntime>()), 
+            return ServiceCollectionDescriptorExtensions.Add(services,
+                new ServiceDescriptor(typeof(IBlazorDownloadFileService),
+                sp => new BlazorDownloadFileService(sp.GetRequiredService<IJSRuntime>()),
                 lifetime));
         }
     }

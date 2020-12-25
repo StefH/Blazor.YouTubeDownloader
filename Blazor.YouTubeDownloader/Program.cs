@@ -41,6 +41,7 @@ namespace Blazor.YouTubeDownloader
                 .AddFontAwesomeIcons()
 
                 // BlazorDownloadFile
+                .AddBlazorDownloadFile()
 
                 // Own services
                 .AddScoped(sp =>
