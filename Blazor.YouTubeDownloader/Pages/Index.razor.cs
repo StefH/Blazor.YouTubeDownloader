@@ -10,7 +10,6 @@ using System.Web;
 using Blazor.DownloadFileFast.Interfaces;
 using Blazor.YouTubeDownloader.Services;
 using Microsoft.AspNetCore.Components;
-using MimeTypes;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -93,7 +92,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
 
-                var (filename, contentType) = GetFilenameWithContentType(streamInfo);
+                var filename = GetFileNameWithExtension(streamInfo);
 
                 x.Reset();
                 x.Start();
@@ -108,7 +107,7 @@ namespace Blazor.YouTubeDownloader.Pages
                     {
                         lastValue = Progress;
                         StateHasChanged();
-                        await Task.Delay(1); // give the UI some time to catch up
+                        await Task.Delay(5); // give the UI some time to catch up
                     }
                 });
                 x.Stop();
@@ -117,13 +116,14 @@ namespace Blazor.YouTubeDownloader.Pages
                 x.Reset();
                 x.Start();
                 var array = memoryStream.ToArray();
+                memoryStream?.Dispose();
                 x.Stop();
 
                 Console.WriteLine("ToArray = " + x.Elapsed);
 
                 x.Reset();
                 x.Start();
-                await BlazorDownloadFileService.DownloadAsync(filename, array, contentType);
+                await BlazorDownloadFileService.DownloadFileAsync(filename, array);
                 x.Stop();
 
                 Console.WriteLine("Download = " + x.Elapsed);
@@ -134,29 +134,13 @@ namespace Blazor.YouTubeDownloader.Pages
             }
         }
 
-        //public async Task DownloadAsync(string fileName, byte[] file, string contentType)
-        //{
-        //    // Check if the IJSRuntime is the WebAssembly implementation of the JSRuntime
-        //    if (JSRuntime is IJSUnmarshalledRuntime webAssemblyJSRuntime)
-        //    {
-        //        Console.WriteLine("Using BlazorDownloadFileFast");
-        //        webAssemblyJSRuntime.InvokeUnmarshalled<string, string, byte[], bool>("BlazorDownloadFileFast", fileName, contentType, file);
-        //    }
-        //    else
-        //    {
-        //        // Fall back to the slow method if not in WebAssembly
-        //        Console.WriteLine("Using BlazorDownloadFile");
-        //        await JSRuntime.InvokeVoidAsync("BlazorDownloadFile", fileName, contentType, file);
-        //    }
-        //}
-
-        private (string Filename, string ContentType) GetFilenameWithContentType(AudioOnlyStreamInfo streamInfo)
+        private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
         {
             string extension = streamInfo.AudioCodec == AudioCodecOpus ? AudioCodecOpus : streamInfo.Container.Name;
 
             string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
-            return ($"{fileName}.{extension}", MimeTypeMap.GetMimeType(extension));
+            return $"{fileName}.{extension}";
         }
 
         private static string GetSafeFileName(string fileName)

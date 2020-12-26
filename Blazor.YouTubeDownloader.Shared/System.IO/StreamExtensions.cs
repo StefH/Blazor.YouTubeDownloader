@@ -63,7 +63,7 @@ namespace System.IO
 
             if (sourceLength <= 0 && source.CanSeek)
             {
-                sourceLength = source.Length - source.Position;
+                sourceLength = source.Length;
             }
 
             using var buffer = PooledBuffer.ForStream(bufferSize);
@@ -80,7 +80,7 @@ namespace System.IO
         }
 
         /// <summary>
-        /// Copies a stream to another stream
+        /// Asynchronously reads the bytes from the current stream and writes them to another stream and reports the progress.
         /// </summary>
         /// <param name="source">The source <see cref="Stream"/> to copy from.</param>
         /// <param name="sourceLength">The length of the source stream, if known - used for progress reporting.</param>
@@ -97,7 +97,7 @@ namespace System.IO
         ) => CopyToAsync(source, sourceLength, destination, DefaultBufferSize, progress, cancellationToken);
 
         /// <summary>
-        /// Copies a stream to another stream
+        /// Asynchronously reads the bytes from the current stream and writes them to another stream and reports the progress.
         /// </summary>
         /// <param name="source">The source <see cref="Stream"/> to copy from</param>
         /// <param name="destination">The <see cref="Stream"/> to which the contents of the current stream will be copied.</param>
@@ -112,10 +112,10 @@ namespace System.IO
 
         private static async Task<int> CopyBufferedToAsync(this Stream source, Stream destination, byte[] buffer, CancellationToken cancellationToken = default)
         {
-            var bytesCopied = await source.ReadAsync(buffer, cancellationToken);
-            await destination.WriteAsync(buffer, 0, bytesCopied, cancellationToken);
+            var bytesRead = await source.ReadAsync(buffer, cancellationToken);
+            await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken);
 
-            return bytesCopied;
+            return bytesRead;
         }
     }
 }
