@@ -18,7 +18,6 @@ namespace Blazor.YouTubeDownloader.Pages
     public partial class Index
     {
         private static int NoSelection = -1;
-        private static string AudioCodecOpus = "opus";
 
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
@@ -102,7 +101,7 @@ namespace Blazor.YouTubeDownloader.Pages
                 await stream.CopyToAsync(memoryStream, async (e) =>
                 {
                     Progress = 100 * e.TotalBytesRead / e.SourceLength;
-                    
+
                     if (Progress != lastValue)
                     {
                         lastValue = Progress;
@@ -136,11 +135,9 @@ namespace Blazor.YouTubeDownloader.Pages
 
         private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
         {
-            string extension = streamInfo.AudioCodec == AudioCodecOpus ? AudioCodecOpus : streamInfo.Container.Name;
-
             string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
-            return $"{fileName}.{extension}";
+            return $"{fileName}.{streamInfo.Container.Name}";
         }
 
         private static string GetSafeFileName(string fileName)
