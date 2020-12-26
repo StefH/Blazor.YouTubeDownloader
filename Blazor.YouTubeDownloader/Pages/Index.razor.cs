@@ -7,10 +7,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
-using Blazor.DownloadFile.Interfaces;
+using Blazor.DownloadFileFast.Interfaces;
 using Blazor.YouTubeDownloader.Services;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 using MimeTypes;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
@@ -21,9 +20,6 @@ namespace Blazor.YouTubeDownloader.Pages
     {
         private static int NoSelection = -1;
         private static string AudioCodecOpus = "opus";
-
-        //[Inject]
-        //public IJSRuntime JSRuntime { get; set; }
 
         [Inject]
         public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
