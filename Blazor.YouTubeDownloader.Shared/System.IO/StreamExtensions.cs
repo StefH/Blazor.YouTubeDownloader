@@ -12,7 +12,7 @@ namespace System.IO
         private const int DefaultBufferSize = 81920;
 
         /// <summary>
-        /// Asynchronously reads the bytes from the current stream and writes them to another stream, using a specified buffer size and cancellation token.
+        /// Asynchronously reads the bytes from the current stream and writes them to another stream and reports the progress.
         /// </summary>
         /// <param name="source">The source <see cref="Stream"/> to copy from.</param>
         /// <param name="sourceLength">The length of the source stream, if known - used for progress reporting.</param>
