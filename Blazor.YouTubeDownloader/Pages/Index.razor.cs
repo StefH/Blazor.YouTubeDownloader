@@ -17,6 +17,8 @@ namespace Blazor.YouTubeDownloader.Pages
 {
     public partial class Index
     {
+        private const string AudioCodecOpus = "opus";
+
         private static int NoSelection = -1;
 
         [Inject]
@@ -25,17 +27,21 @@ namespace Blazor.YouTubeDownloader.Pages
         [Inject]
         public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
 
+        public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
+
         public bool ProcessYouTubeUrlButtonEnabled = true;
 
         public bool DownloadButtonEnabled;
+
+        public bool OpusAudioStreamPresent;
+
+        public bool RenameOpus;
 
         public Video? VideoMetaData;
 
         public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
 
-        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround for https://github.com/stsrki/Blazorise/issues/1635
-
-        public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
+        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround for https://github.com/stsrki/Blazorise/issues/1635        
 
         public long Progress;
 
@@ -47,6 +53,8 @@ namespace Blazor.YouTubeDownloader.Pages
             ProcessYouTubeUrlButtonEnabled = false;
             DownloadButtonEnabled = false;
             Progress = 0;
+            OpusAudioStreamPresent = false;
+            RenameOpus = false;
 
             try
             {
@@ -60,6 +68,8 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 var highest = AudioOnlyStreamInfos.WithHighestBitrate();
                 CheckedAudioOnlyStreamInfoHashCode = highest != null ? highest.GetHashCode() : NoSelection;
+                OpusAudioStreamPresent = AudioOnlyStreamInfos.Any(a => a.AudioCodec == AudioCodecOpus);
+                RenameOpus = OpusAudioStreamPresent;
             }
             finally
             {
@@ -135,9 +145,11 @@ namespace Blazor.YouTubeDownloader.Pages
 
         private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
         {
+            string extension = streamInfo.AudioCodec == AudioCodecOpus && RenameOpus ? AudioCodecOpus : streamInfo.Container.Name;
+
             string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
-            return $"{fileName}.{streamInfo.Container.Name}";
+            return $"{fileName}.{extension}";
         }
 
         private static string GetSafeFileName(string fileName)

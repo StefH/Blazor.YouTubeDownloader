@@ -18,46 +18,51 @@
         </Field>
     </CardBody>
 
-    @if (VideoMetaData != null)
-    {
-        <CardBody>
-            <Field Horizontal="true">
-                <FieldLabel ColumnSize="ColumnSize.Is3">Title</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
-                    <Label>@VideoMetaData.Title</Label>
-                </FieldBody>
-            </Field>
-            <Field Horizontal="true">
-                <FieldLabel ColumnSize="ColumnSize.Is3">Duration</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
-                    <Label>@VideoMetaData.Duration</Label>
-                </FieldBody>
-            </Field>
 
-            <Field Horizontal="true">
-                <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
-                    <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
-                        @foreach (var info in AudioOnlyStreamInfos)
-                        {
-                            <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
-                        }
-                    </RadioGroup>
-                </FieldBody>
-            </Field>
+    <CardBody Display="@(VideoMetaData != null ? Display.Always : Display.None)">
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Title</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <Label>@VideoMetaData?.Title</Label>
+            </FieldBody>
+        </Field>
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Duration</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <Label>@VideoMetaData?.Duration</Label>
+            </FieldBody>
+        </Field>
 
-            <Field Horizontal="true">
-                <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
-                <FieldBody ColumnSize="ColumnSize.Is4">
-                    <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Loading="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
+                    @foreach (var info in AudioOnlyStreamInfos)
+                    {
+                        <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
+                    }
+                </RadioGroup>
+            </FieldBody>
+        </Field>
 
-                    <div style="margin-top: 10px;">
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="@($"width: {@Progress}%")" aria-valuenow="@Progress" aria-valuemin="0" aria-valuemax="100"></div>
-                        </div>
+        <Field Horizontal="true" Display="@(OpusAudioStreamPresent ? Display.Always : Display.None)">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Rename .webm to .opus</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <Check @bind-Checked="@RenameOpus"></Check>
+            </FieldBody>
+        </Field>
+
+        <Field Horizontal="true">
+            <FieldLabel ColumnSize="ColumnSize.Is3">Download Audio</FieldLabel>
+            <FieldBody ColumnSize="ColumnSize.Is4">
+                <Button Color="Color.Primary" Disabled="@(!DownloadButtonEnabled)" Loading="@(!DownloadButtonEnabled)" Clicked="@DownloadFileAsync">Download</Button>
+
+                <div style="margin-top: 10px;">
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="@($"width: {@Progress}%")" aria-valuenow="@Progress" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
-                </FieldBody>
-            </Field>
-        </CardBody>
-    }
+                </div>
+            </FieldBody>
+        </Field>
+    </CardBody>
 </Card>
