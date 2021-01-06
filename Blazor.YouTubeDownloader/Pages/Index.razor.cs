@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Blazor.DownloadFileFast.Interfaces;
 using Blazor.YouTubeDownloader.Services;
+using Matroska.Muxer;
 using Microsoft.AspNetCore.Components;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
@@ -35,7 +36,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         public bool OpusAudioStreamPresent;
 
-        public bool RenameOpus;
+        public bool ExtractOpus;
 
         public Video? VideoMetaData;
 
@@ -54,7 +55,7 @@ namespace Blazor.YouTubeDownloader.Pages
             DownloadButtonEnabled = false;
             Progress = 0;
             OpusAudioStreamPresent = false;
-            RenameOpus = false;
+            ExtractOpus = false;
 
             try
             {
@@ -69,7 +70,7 @@ namespace Blazor.YouTubeDownloader.Pages
                 var highest = AudioOnlyStreamInfos.WithHighestBitrate();
                 CheckedAudioOnlyStreamInfoHashCode = highest != null ? highest.GetHashCode() : NoSelection;
                 OpusAudioStreamPresent = AudioOnlyStreamInfos.Any(a => a.AudioCodec == AudioCodecOpus);
-                RenameOpus = OpusAudioStreamPresent;
+                ExtractOpus = OpusAudioStreamPresent;
             }
             finally
             {
@@ -123,12 +124,25 @@ namespace Blazor.YouTubeDownloader.Pages
                 Console.WriteLine("CopyToAsync = " + x.Elapsed);
 
                 x.Reset();
-                x.Start();
-                var array = memoryStream.ToArray();
-                memoryStream?.Dispose();
-                x.Stop();
+                byte[] array;
+                if (ExtractOpus)
+                {
+                    using var opusStream = new MemoryStream();
 
-                Console.WriteLine("ToArray = " + x.Elapsed);
+                    x.Start();
+                    MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
+                    x.Stop();
+                    Console.WriteLine("ExtractOggOpusAudio = " + x.Elapsed);
+
+                    array = opusStream.ToArray();
+                }
+                else
+                {
+                    x.Start();
+                    array = memoryStream.ToArray();
+                    x.Stop();
+                    Console.WriteLine("ToArray = " + x.Elapsed);
+                }
 
                 x.Reset();
                 x.Start();
@@ -145,7 +159,7 @@ namespace Blazor.YouTubeDownloader.Pages
 
         private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
         {
-            string extension = streamInfo.AudioCodec == AudioCodecOpus && RenameOpus ? AudioCodecOpus : streamInfo.Container.Name;
+            string extension = streamInfo.AudioCodec == AudioCodecOpus && ExtractOpus ? AudioCodecOpus : streamInfo.Container.Name;
 
             string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 

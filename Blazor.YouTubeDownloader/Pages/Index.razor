@@ -46,9 +46,9 @@
         </Field>
 
         <Field Horizontal="true" Display="@(OpusAudioStreamPresent ? Display.Always : Display.None)">
-            <FieldLabel ColumnSize="ColumnSize.Is3">Rename .webm to .opus</FieldLabel>
+            <FieldLabel ColumnSize="ColumnSize.Is3">Extract opus from webm</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is4">
-                <Check @bind-Checked="@RenameOpus"></Check>
+                <Check @bind-Checked="@ExtractOpus"></Check>
             </FieldBody>
         </Field>
 
