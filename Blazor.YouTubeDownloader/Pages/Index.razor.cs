@@ -130,11 +130,13 @@ namespace Blazor.YouTubeDownloader.Pages
                     using var opusStream = new MemoryStream();
 
                     x.Start();
+                    memoryStream.Position = 0;
                     MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
-                    x.Stop();
-                    Console.WriteLine("ExtractOggOpusAudio = " + x.Elapsed);
+                    
+                    Console.WriteLine("ExtractOggOpusAudio and ToArray = " + x.Elapsed);
 
                     array = opusStream.ToArray();
+                    x.Stop();
                 }
                 else
                 {
