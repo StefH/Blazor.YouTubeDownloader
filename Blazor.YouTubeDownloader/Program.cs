@@ -25,7 +25,7 @@ namespace Blazor.YouTubeDownloader
             bool isLocalHost = baseAddress.Contains("localhost");
             Console.WriteLine("isLocalHost = " + isLocalHost);
 
-            bool isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtubedownloader.heyenrath.nl");
+            bool isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtube-downloader.heyenrath.nl");
             Console.WriteLine("isAzure = " + isAzure);
 
             string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
