@@ -36,7 +36,7 @@
         <Field Horizontal="true">
             <FieldLabel ColumnSize="ColumnSize.Is3">Audio Streams</FieldLabel>
             <FieldBody ColumnSize="ColumnSize.Is4">
-                <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" @bind-CheckedValue="@CheckedAudioOnlyStreamInfoHashCode">
+                <RadioGroup TValue="int" Name="AudioOnlyStreamInfos" CheckedValue="@CheckedAudioOnlyStreamInfoHashCode" CheckedValueChanged="@OnAudioOnlyStreamCheckedValueChanged">
                     @foreach (var info in AudioOnlyStreamInfos)
                     {
                         <Radio TValue="int" Value="@info.GetHashCode()">@info.GetTitle()</Radio>
