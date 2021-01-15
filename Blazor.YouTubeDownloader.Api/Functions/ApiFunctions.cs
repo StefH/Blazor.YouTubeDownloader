@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.Json.Extensions.Services;
 using System.Threading.Tasks;
 using Blazor.YouTubeDownloader.Api.Models;
+using Matroska.Muxer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -35,7 +36,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             string url = req.Query["YouTubeUrl"].Single();
 
             var videoMetaData = await _client.Videos.GetAsync(url);
-            
+
             return new SystemTextJsonResult(videoMetaData, new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
         }
 
@@ -61,6 +62,25 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
             return await _client.Videos.Streams.GetAsync(streamInfo);
+        }
+
+        [FunctionName("GetOggOpusAudioStream")]
+        public async Task<Stream> GetOggOpusAudioStreamAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync");
+
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+
+            using var destinationStream = new MemoryStream();
+
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            destinationStream.Position = 0;
+
+            var oggOpusStream = new MemoryStream();
+            MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, oggOpusStream);
+
+            oggOpusStream.Position = 0;
+            return oggOpusStream;
         }
 
         [FunctionName("GetAudioBytes")]

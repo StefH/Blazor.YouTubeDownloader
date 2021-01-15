@@ -8,9 +8,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Blazor.DownloadFileFast.Interfaces;
-using Blazor.YouTubeDownloader.Services;
 using Blazor.YouTubeDownloader.Extensions;
-using Matroska.Muxer;
+using Blazor.YouTubeDownloader.Services;
 using Microsoft.AspNetCore.Components;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
@@ -104,10 +103,22 @@ namespace Blazor.YouTubeDownloader.Pages
 
                 x.Reset();
                 x.Start();
-                var stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
-                x.Stop();
 
-                Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
+                // bool oggOpusIsExtractedByServer = false;
+                Stream stream;
+                if (streamInfo.IsOpus() && ExtractOpus)
+                {
+                    stream = await YouTubeDownloadApi.GetOggOpusAudioStreamAsync(streamInfo);
+                    // oggOpusIsExtractedByServer = true;
+                    x.Stop();
+                    Console.WriteLine("GetOggOpusAudioStreamAsync = " + x.Elapsed);
+                }
+                else
+                {
+                    stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
+                    x.Stop();
+                    Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
+                }
 
                 var filename = GetFileNameWithExtension(streamInfo);
 
@@ -130,28 +141,33 @@ namespace Blazor.YouTubeDownloader.Pages
                 x.Stop();
                 Console.WriteLine("CopyToAsync = " + x.Elapsed);
 
+                //byte[] array;
+                //if (OpusAudioStreamPresent && ExtractOpus && !oggOpusIsExtractedByServer)
+                //{
+                //    using var opusStream = new MemoryStream();
+
+                //    x.Start();
+                //    memoryStream.Position = 0;
+                //    MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
+
+                //    Console.WriteLine("ExtractOggOpusAudio and ToArray = " + x.Elapsed);
+
+                //    array = opusStream.ToArray();
+                //    x.Stop();
+                //}
+                //else
+                //{
+                //    x.Start();
+                //    array = memoryStream.ToArray();
+                //    x.Stop();
+                //    Console.WriteLine("ToArray = " + x.Elapsed);
+                //}
+
                 x.Reset();
-                byte[] array;
-                if (OpusAudioStreamPresent && ExtractOpus)
-                {
-                    using var opusStream = new MemoryStream();
-
-                    x.Start();
-                    memoryStream.Position = 0;
-                    MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
-                    
-                    Console.WriteLine("ExtractOggOpusAudio and ToArray = " + x.Elapsed);
-
-                    array = opusStream.ToArray();
-                    x.Stop();
-                }
-                else
-                {
-                    x.Start();
-                    array = memoryStream.ToArray();
-                    x.Stop();
-                    Console.WriteLine("ToArray = " + x.Elapsed);
-                }
+                x.Start();
+                byte[] array = memoryStream.ToArray();
+                x.Stop();
+                Console.WriteLine("ToArray = " + x.Elapsed);
 
                 x.Reset();
                 x.Start();
