@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text.Json.Extensions.Services;
 using Blazor.YouTubeDownloader.Api;
+using Blazor.YouTubeDownloader.Api.HttpClientHandlers;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +34,7 @@ namespace Blazor.YouTubeDownloader.Api
 
             builder.Services.AddScoped(sp =>
             {
-                var httpClient = new HttpClient();
+                var httpClient = new HttpClient(new YouTubeCookieConsentHandler());
                 return new YoutubeClient(httpClient);
             });
 
