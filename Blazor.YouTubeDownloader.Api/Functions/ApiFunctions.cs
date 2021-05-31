@@ -49,7 +49,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var manifest = await _client.Videos.Streams.GetManifestAsync(url);
 
-            var audioStreams = manifest.GetAudioOnly().OrderBy(a => a.Bitrate);
+            var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
 
             return new SystemTextJsonResult(audioStreams);
         }
@@ -71,7 +71,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            using var destinationStream = new MemoryStream();
+            await using var destinationStream = new MemoryStream();
 
             await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
             destinationStream.Position = 0;
@@ -90,7 +90,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            using var destinationStream = new MemoryStream();
+            await using var destinationStream = new MemoryStream();
 
             await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
 

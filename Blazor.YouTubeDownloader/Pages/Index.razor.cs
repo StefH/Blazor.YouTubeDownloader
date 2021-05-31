@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Pipelines;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -60,13 +59,13 @@ namespace Blazor.YouTubeDownloader.Pages
                 var taskVideoMetaData = YouTubeDownloadApi.GetVideoMetaDataAsync(YouTubeUrl);
                 var taskAudioOnlyStreamInfos = YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
 
-                await Task.WhenAll(new Task[] { taskVideoMetaData, taskAudioOnlyStreamInfos });
+                await Task.WhenAll(taskVideoMetaData, taskAudioOnlyStreamInfos);
 
                 VideoMetaData = await taskVideoMetaData;
                 AudioOnlyStreamInfos = await taskAudioOnlyStreamInfos;
 
-                var highest = AudioOnlyStreamInfos.WithHighestBitrate();
-                CheckedAudioOnlyStreamInfoHashCode = highest != null ? highest.GetHashCode() : NoSelection;
+                var highest = AudioOnlyStreamInfos.TryGetWithHighestBitrate();
+                CheckedAudioOnlyStreamInfoHashCode = highest?.GetHashCode() ?? NoSelection;
                 OpusAudioStreamPresent = AudioOnlyStreamInfos.Any(a => a.IsOpus());
                 ExtractOpus = OpusAudioStreamPresent;
             }

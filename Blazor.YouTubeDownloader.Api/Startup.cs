@@ -32,11 +32,12 @@ namespace Blazor.YouTubeDownloader.Api
                 .CreateLogger();
             builder.Services.AddLogging(lb => lb.AddSerilog(logger, dispose: true));
 
-            builder.Services.AddScoped(sp =>
-            {
-                var httpClient = new HttpClient(new YouTubeCookieConsentHandler());
-                return new YoutubeClient(httpClient);
-            });
+            //builder.Services.AddScoped(sp =>
+            //{
+            //    var httpClient = new HttpClient(new YouTubeCookieConsentHandler());
+            //    return new YoutubeClient(httpClient);
+            //});
+            builder.Services.AddScoped<YoutubeClient>();
 
             builder.Services.AddSingleton<ISerializer, Serializer>();
         }
