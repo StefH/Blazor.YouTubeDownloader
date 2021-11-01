@@ -75,24 +75,32 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            var httpClient = _factory.CreateClient();
+            //var httpClient = _factory.CreateClient();
 
-            byte[] bytes;
-            try
-            {
-                bytes = await httpClient.GetByteArrayAsync(streamInfo.Url);
-            }
-            catch (Exception e)
-            {
-                int xxx = 0;
-                throw;
-            }
-            await using var destinationStream = new MemoryStream(bytes);
+            //byte[] bytes;
+            //try
+            //{
+            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - before GetByteArrayAsync");
+            //    var response = await httpClient.GetAsync(streamInfo.Url);
+            //    if (response.IsSuccessStatusCode)
+            //    {
+
+            //    }
+            //    bytes = await response.Content.ReadAsByteArrayAsync();
+            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - after GetByteArrayAsync");
+            //}
+            //catch (Exception e)
+            //{
+            //    _logger.LogError("HttpTrigger - GetOggOpusAudioStreamAsync ERROR", e);
+            //    int xxx = 0;
+            //    throw;
+            //}
+            var destinationStream = new MemoryStream();
 
             //using var stream = await httpClient.GetStreamAsync(streamInfo.Url);
             //await stream.CopyToAsync(destinationStream);
 
-            //await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
 
             destinationStream.Position = 0;
 
