@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Web;
 using Flurl;
 using Jurassic;
 
@@ -15,10 +13,8 @@ namespace YouTubeUrlDecoder
             _engine = new ScriptEngine();
         }
 
-        public Url Decode(string body, string uri)
+        public Url Decode(string body, Url url)
         {
-            var url = new Url(uri);
-
             return DecodeN(body, DecipherSignature(body, url));
         }
 
@@ -29,10 +25,8 @@ namespace YouTubeUrlDecoder
                 return url;
             }
 
-            Console.WriteLine(n.ToString());
-            var nCode = DecodeUtils.ExtractNCode(body, n.ToString());
-            var nDecoded = _engine.Evaluate(nCode).ToString();
-            Console.WriteLine(nDecoded);
+            var (code, argumentName) = DecodeUtils.ExtractNCode(body);
+            var nDecoded = Evaluate(code, argumentName, n);
 
             return url.SetQueryParam("n", nDecoded);
         }
@@ -46,10 +40,17 @@ namespace YouTubeUrlDecoder
 
             var signatureParameter = url.QueryParams.FirstOrDefault("sp") as string ?? "signature";
 
-            var sigCode = DecodeUtils.ExtractDecipher(body, s.ToString());
-            var signatureValue = _engine.Evaluate(sigCode).ToString();
+            var (code, argumentName) = DecodeUtils.ExtractDecipher(body);
+            var signatureValue = Evaluate(code, argumentName, s);
 
             return url.SetQueryParam(signatureParameter, signatureValue);
+        }
+
+        private string Evaluate(string code, string argumentName, object argumentValue)
+        {
+            var finalCode = $"const {argumentName} = '{argumentValue}';{code}";
+            Console.WriteLine(finalCode);
+            return _engine.Evaluate(finalCode).ToString();
         }
     }
 }

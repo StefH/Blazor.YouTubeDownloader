@@ -24,7 +24,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Decode", "Decode", "{EDC25586-54B5-4D4E-BB56-383E1AF76CF0}"
 	ProjectSection(SolutionItems) = preProject
 		Decode\base.js = Decode\base.js
-		N.js = N.js
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "YouTubeUrlDecoder", "YouTubeUrlDecoder\YouTubeUrlDecoder.csproj", "{CB96FF70-CCA8-4CD5-ADC1-09F73EB95BDF}"

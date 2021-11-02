@@ -5,19 +5,21 @@
     /// </summary>
     internal static class DecodeUtils
     {
-        public static string ExtractNCode(string body, string n)
+        public static (string code, string argumentName) ExtractNCode(string body)
         {
+            var argumentName = $"n__";
             var functionName = body.Between("&&(b=a.get(\"n\"))&&(b=", "(b)");
             var functionStart = $"{functionName}=function(a)";
 
             var ndx = body.IndexOf(functionStart);
             var subBody = body.Substring(ndx + functionStart.Length);
 
-            return $"var {functionStart}{subBody.CutAfterJSON()};{functionName}('{n}');";
+            return ($"var {functionStart}{subBody.CutAfterJSON()};{functionName}({argumentName});", argumentName);
         }
 
-        public static string ExtractDecipher(string body, string sig)
+        public static (string code, string argumentName) ExtractDecipher(string body)
         {
+            var argumentName = $"s__";
             var functionName = body.Between("a.set(\"alr\",\"yes\");c&&(c=", "(decodeURIComponent");
             var functionStart = $"{functionName}=function(a)";
 
@@ -26,7 +28,7 @@
 
             var functionBody = $"var {functionStart}{subBody.CutAfterJSON()};";
 
-            return $"{ExtractManipulations(body, functionBody)};{functionBody};{functionName}('{sig}');";
+            return ($"{ExtractManipulations(body, functionBody)};{functionBody};{functionName}({argumentName});", argumentName);
         }
 
         private static string ExtractManipulations(string body, string caller)
