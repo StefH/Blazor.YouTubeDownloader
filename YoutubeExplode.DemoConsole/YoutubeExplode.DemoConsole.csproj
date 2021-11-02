@@ -6,11 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!--<PackageReference Include="VideoLibrary" Version="3.1.1" />-->
-    <PackageReference Include="YoutubeExplode" Version="6.0.5" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
+    <ProjectReference Include="..\YoutubeExplode-master\YoutubeExplode\YoutubeExplode.csproj" />
     <ProjectReference Include="..\YouTubeUrlDecoder\YouTubeUrlDecoder.csproj" />
   </ItemGroup>
 
