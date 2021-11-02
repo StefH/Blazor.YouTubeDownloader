@@ -18,6 +18,23 @@ namespace YouTubeUrlDecoder
             return DecodeN(body, DecipherSignature(body, url));
         }
 
+        public Url DecodeN(Url url)
+        {
+            if (!url.QueryParams.TryGetFirst("n", out var n))
+            {
+                return url;
+            }
+
+            // Option 1
+            // var (code, argumentName) = DecodeUtils.ExtractNCode(body);
+            // var nDecoded = Evaluate(code, argumentName, n);
+
+            // Option 2
+            var nDecoded = Evaluate(N.Code, "n__", n); // Hardcoded...
+
+            return url.SetQueryParam("n", nDecoded);
+        }
+
         private Url DecodeN(string body, Url url)
         {
             if (!url.QueryParams.TryGetFirst("n", out var n))

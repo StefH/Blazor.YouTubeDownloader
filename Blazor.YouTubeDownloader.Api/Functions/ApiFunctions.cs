@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -14,6 +13,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
+using YouTubeUrlDecoder;
 
 namespace Blazor.YouTubeDownloader.Api.Functions
 {
@@ -75,32 +75,12 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            //var httpClient = _factory.CreateClient();
+            var fixedUrl = new UrlDescrambler().DecodeN(streamInfo.Url);
+            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
 
-            //byte[] bytes;
-            //try
-            //{
-            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - before GetByteArrayAsync");
-            //    var response = await httpClient.GetAsync(streamInfo.Url);
-            //    if (response.IsSuccessStatusCode)
-            //    {
-
-            //    }
-            //    bytes = await response.Content.ReadAsByteArrayAsync();
-            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - after GetByteArrayAsync");
-            //}
-            //catch (Exception e)
-            //{
-            //    _logger.LogError("HttpTrigger - GetOggOpusAudioStreamAsync ERROR", e);
-            //    int xxx = 0;
-            //    throw;
-            //}
             var destinationStream = new MemoryStream();
 
-            //using var stream = await httpClient.GetStreamAsync(streamInfo.Url);
-            //await stream.CopyToAsync(destinationStream);
-
-            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            await _client.Videos.Streams.CopyToAsync(fixedStreamInfo, destinationStream);
 
             destinationStream.Position = 0;
 
@@ -117,10 +97,12 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+            var fixedUrl = new UrlDescrambler().DecodeN(streamInfo.Url);
+            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
 
             await using var destinationStream = new MemoryStream();
 
-            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            await _client.Videos.Streams.CopyToAsync(fixedStreamInfo, destinationStream);
 
             return destinationStream.ToArray();
         }
