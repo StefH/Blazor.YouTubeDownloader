@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Extensions.Services;
 using System.Threading.Tasks;
@@ -19,12 +21,14 @@ namespace Blazor.YouTubeDownloader.Api.Functions
     {
         private readonly ILogger<ApiFunctions> _logger;
         private readonly YoutubeClient _client;
+        private readonly IHttpClientFactory _factory;
         private readonly ISerializer _serializer;
 
-        public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, ISerializer serializer)
+        public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory, ISerializer serializer)
         {
             _logger = logger;
             _client = client;
+            _factory = factory;
             _serializer = serializer;
         }
 
@@ -71,9 +75,33 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            await using var destinationStream = new MemoryStream();
+            //var httpClient = _factory.CreateClient();
+
+            //byte[] bytes;
+            //try
+            //{
+            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - before GetByteArrayAsync");
+            //    var response = await httpClient.GetAsync(streamInfo.Url);
+            //    if (response.IsSuccessStatusCode)
+            //    {
+
+            //    }
+            //    bytes = await response.Content.ReadAsByteArrayAsync();
+            //    _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync - after GetByteArrayAsync");
+            //}
+            //catch (Exception e)
+            //{
+            //    _logger.LogError("HttpTrigger - GetOggOpusAudioStreamAsync ERROR", e);
+            //    int xxx = 0;
+            //    throw;
+            //}
+            var destinationStream = new MemoryStream();
+
+            //using var stream = await httpClient.GetStreamAsync(streamInfo.Url);
+            //await stream.CopyToAsync(destinationStream);
 
             await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+
             destinationStream.Position = 0;
 
             var oggOpusStream = new MemoryStream();
