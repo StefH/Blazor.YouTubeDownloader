@@ -6,6 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="JavaScript\n.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="JavaScript\n.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Flurl" Version="3.0.2" />
     <PackageReference Include="Jurassic" Version="3.2.4" />
   </ItemGroup>

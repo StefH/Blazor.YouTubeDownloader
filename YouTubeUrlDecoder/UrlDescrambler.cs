@@ -1,6 +1,6 @@
-﻿using System;
-using Flurl;
+﻿using Flurl;
 using Jurassic;
+using YouTubeUrlDecoder.JavaScript;
 
 namespace YouTubeUrlDecoder
 {
@@ -25,8 +25,12 @@ namespace YouTubeUrlDecoder
                 return url;
             }
 
-            var (code, argumentName) = DecodeUtils.ExtractNCode(body);
-            var nDecoded = Evaluate(code, argumentName, n);
+            // Option 1
+            // var (code, argumentName) = DecodeUtils.ExtractNCode(body);
+            // var nDecoded = Evaluate(code, argumentName, n);
+
+            // Option 2
+            var nDecoded = Evaluate(N.Code, "n__", n); // Hardcoded...
 
             return url.SetQueryParam("n", nDecoded);
         }
@@ -49,7 +53,7 @@ namespace YouTubeUrlDecoder
         private string Evaluate(string code, string argumentName, object argumentValue)
         {
             var finalCode = $"const {argumentName} = '{argumentValue}';{code}";
-            // Console.WriteLine(finalCode);
+
             return _engine.Evaluate(finalCode).ToString();
         }
     }
