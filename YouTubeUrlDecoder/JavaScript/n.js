@@ -1,5 +1,5 @@
 ﻿var qha = function (a) {
-    var b = a.split(""),
+    var b = a.split(''),
         c = [-470482026, -691770757, function (d, e) {
             e = (e % d.length + d.length) % d.length;
             d.splice(-e).reverse().forEach(function (f) {
@@ -42,7 +42,7 @@
             e = (e % d.length + d.length) % d.length;
             d.splice(e, 1)
         },
-            "push",
+            'push',
         function (d, e) {
             for (var f = 64, h = []; ++f - h.length - 32;) switch (f) {
                 case 58:
@@ -63,7 +63,7 @@
             }
             d.forEach(function (l, m, n) {
                 this.push(n[m] = h[(h.indexOf(l) - h.indexOf(this[m]) + m - 32 + f--) % h.length])
-            }, e.split(""))
+            }, e.split(''))
         }
         ];
     c[17] = c;
@@ -73,8 +73,8 @@
         c[45](c[17], c[38]), c[12](c[44], c[29]), c[45](c[26], c[0]), c[51](c[41], c[13]), c[12](c[41], c[27]), c[12](c[26], c[11]), c[39](c[17], c[49]), c[9](c[38], c[47]), c[26](c[40], c[0]), c[7](c[8], c[44]), c[14](c[54], c[0]), c[18](c[3], c[25]), c[7](c[33], c[36]), c[15](c[19], c[14]), c[7](c[19], c[9]), c[7](c[6], c[12]), c[41](c[33], c[35]), c[7](c[40], c[5]), c[50](c[42]), c[13](c[14], c[17]), c[6](c[35], c[51]), c[26](c[48], c[50]), c[26](c[35], c[0]), c[6](c[21], c[46]), c[15](c[21], c[42]), c[1](c[2], c[43]), c[15](c[2],
             c[31]), c[1](c[21], c[25]), c[22](c[30], c[17]), c[15](c[44], c[46]), c[22](c[44], c[11]), c[22](c[23], c[38]), c[1](c[23], c[14]), c[35](c[23], c[44]), c[11](c[53], c[20]), c[9](c[51]), c[31](c[51], c[28]), c[18](c[51], c[35]), c[46](c[53], c[6]), c[52](c[51], c[49]), c[11](c[53], c[15])
     } catch (d) {
-        return "enhanced_except_75MBkOz-_w8_" + a
+        return 'enhanced_except_75MBkOz-_w8_' + a
     }
-    return b.join("")
+    return b.join('')
 };
 qha(n__);
