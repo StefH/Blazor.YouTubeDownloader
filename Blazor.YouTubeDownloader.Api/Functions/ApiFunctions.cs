@@ -75,8 +75,8 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            var fixedUrl = new UrlDescrambler().Fix(streamInfo.Url);
-            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
+            var fixedUrl = new UrlDescrambler2().Fix(streamInfo.Url);
+            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, streamInfo.AudioCodec);
 
             var destinationStream = new MemoryStream();
 
@@ -97,7 +97,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
-            var fixedUrl = new UrlDescrambler().DecodeN(streamInfo.Url);
+            var fixedUrl = new UrlDescrambler2().DecodeN(streamInfo.Url);
             IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
 
             await using var destinationStream = new MemoryStream();
