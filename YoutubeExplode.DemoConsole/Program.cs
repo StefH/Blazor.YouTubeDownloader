@@ -30,9 +30,12 @@ namespace YoutubeExplode.DemoConsole
                 Console.WriteLine(streamInfo.Bitrate);
                 Console.WriteLine(streamInfo.Url);
 
-                var body = File.ReadAllText(@"C:\temp\base.js");
+              //  YoutubeController _controller;
 
-                var fixedUrl = new UrlDescrambler().Decode(body, streamInfo.Url);
+
+                var code = File.ReadAllText(@"C:\temp\base.js");
+
+                var fixedUrl = new UrlDescrambler2().Decode(code, streamInfo.Url);
                 Console.WriteLine(fixedUrl);
 
                 IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);

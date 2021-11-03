@@ -1,12 +1,15 @@
 <Project>
-	<PropertyGroup>
-		<Nullable>enable</Nullable>
-		<!--<LangVersion>latest</LangVersion>-->
-		<Nullable>enable</Nullable>
-		<!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <!--<LangVersion>latest</LangVersion>-->
+    <!--<WarningsAsErrors>nullable</WarningsAsErrors>-->
 
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<RepositoryType>git</RepositoryType>
-	</PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
+    <Authors>Stef Heyenrath</Authors>
+    <Copyright>Stef Heyenrath</Copyright>
+  </PropertyGroup>
+
+
 
 </Project>

@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
-    <ProjectReference Include="..\YoutubeExplode-master\YoutubeExplode\YoutubeExplode.csproj" />
+    <ProjectReference Include="..\YoutubeExplode.Extensions\YoutubeExplode.Extensions.csproj" />
     <ProjectReference Include="..\YouTubeUrlDecoder\YouTubeUrlDecoder.csproj" />
   </ItemGroup>
 

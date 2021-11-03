@@ -4,11 +4,11 @@ using YouTubeUrlDecoder.JavaScript;
 
 namespace YouTubeUrlDecoder
 {
-    public class UrlDescrambler
+    public class UrlDescrambler2
     {
         private readonly ScriptEngine _engine;
 
-        public UrlDescrambler()
+        public UrlDescrambler2()
         {
             _engine = new ScriptEngine();
         }
@@ -18,12 +18,12 @@ namespace YouTubeUrlDecoder
             return DecodeN(DecipherSignature(url));
         }
 
-        public Url Decode(string body, Url url)
+        public Url Decode(string code, Url url)
         {
             //var (nCode, nArgumentName) = DecodeUtils.ExtractNCode(body);
             //var (sCode, sArgumentName) = DecodeUtils.ExtractDecipher(body);
 
-            return DecodeN(body, DecipherSignature(body, url));
+            return DecodeN(code, DecipherSignature(code, url));
         }
 
         public Url DecodeN(Url url)
