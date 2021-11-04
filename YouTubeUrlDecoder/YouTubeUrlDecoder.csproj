@@ -19,8 +19,4 @@
     <!--<PackageReference Include="YoutubeExplode" Version="6.0.5" />-->
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\YoutubeExplode-master\YoutubeExplode\YoutubeExplode.csproj" />
-  </ItemGroup>
-
 </Project>

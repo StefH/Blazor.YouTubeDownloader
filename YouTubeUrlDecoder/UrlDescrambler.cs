@@ -18,12 +18,12 @@ namespace YouTubeUrlDecoder
             return DecodeN(DecipherSignature(url));
         }
 
-        public Url Decode(string code, Url url)
+        public Url Decode(string playerSource, Url url)
         {
             //var (nCode, nArgumentName) = DecodeUtils.ExtractNCode(body);
             //var (sCode, sArgumentName) = DecodeUtils.ExtractDecipher(body);
 
-            return DecodeN(code, DecipherSignature(code, url));
+            return DecodeN(playerSource, DecipherSignature(playerSource, url));
         }
 
         public Url DecodeN(Url url)

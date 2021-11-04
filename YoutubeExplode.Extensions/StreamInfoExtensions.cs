@@ -2,11 +2,11 @@
 using Stef.Validation;
 using YoutubeExplode.Videos.Streams;
 
-namespace YoutubeExplode.Extensions.Extensions
+namespace YoutubeExplode.Extensions
 {
-    public static class StreamInfoExtensions
+    internal static class StreamInfoExtensions
     {
-        public static void Fix(this IStreamInfo streamInfo)
+        public static void UpdateUrl(this IStreamInfo streamInfo, string url)
         {
             Guard.NotNull(streamInfo, nameof(streamInfo));
 
@@ -15,10 +15,8 @@ namespace YoutubeExplode.Extensions.Extensions
                 return;
             }
 
-            var fixedUrl = UrlDescrambler.Fix(streamInfo.Url).ToString();
-
             var field = streamInfo.GetType().GetField("<Url>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic);
-            field.SetValue(streamInfo, fixedUrl);
+            field.SetValue(streamInfo, url);
         }
     }
 }

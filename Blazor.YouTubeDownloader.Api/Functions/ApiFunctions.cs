@@ -12,8 +12,8 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using YoutubeExplode;
+using YoutubeExplode.Extensions;
 using YoutubeExplode.Videos.Streams;
-using YouTubeUrlDecoder;
 
 namespace Blazor.YouTubeDownloader.Api.Functions
 {
@@ -51,7 +51,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             string url = req.Query["YouTubeUrl"].Single();
 
-            var manifest = await _client.Videos.Streams.GetManifestAsync(url);
+            var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlAsync(url);
 
             var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
 
@@ -75,12 +75,9 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-            var fixedUrl = new UrlDescrambler2().Fix(streamInfo.Url);
-            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, streamInfo.AudioCodec);
-
             var destinationStream = new MemoryStream();
 
-            await _client.Videos.Streams.CopyToAsync(fixedStreamInfo, destinationStream);
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
 
             destinationStream.Position = 0;
 
@@ -97,12 +94,10 @@ namespace Blazor.YouTubeDownloader.Api.Functions
             _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
             var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
-            var fixedUrl = new UrlDescrambler2().DecodeN(streamInfo.Url);
-            IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
 
             await using var destinationStream = new MemoryStream();
 
-            await _client.Videos.Streams.CopyToAsync(fixedStreamInfo, destinationStream);
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
 
             return destinationStream.ToArray();
         }

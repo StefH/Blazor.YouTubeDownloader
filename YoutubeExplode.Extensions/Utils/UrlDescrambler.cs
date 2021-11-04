@@ -1,38 +1,40 @@
 ﻿using Flurl;
 using Jurassic;
-using YoutubeExplode.Extensions.JavaScript;
 
-namespace YoutubeExplode.Extensions
+namespace YoutubeExplode.Extensions.Utils
 {
-    public static class UrlDescrambler
+    internal class UrlDescrambler
     {
-        private static readonly ScriptEngine _engine;
+        private readonly ScriptEngine _engine;
+        private readonly (string code, string argumentName) _nCode;
+        private readonly (string code, string argumentName) _sCode;
 
-        static UrlDescrambler()
+        public UrlDescrambler(string playerSource)
         {
             _engine = new ScriptEngine();
+
+            _nCode = DecodeUtils.ExtractNCode(playerSource);
+            _sCode = DecodeUtils.ExtractDecipher(playerSource);
         }
 
-        public static Url Fix(Url url)
+        public Url Decode(Url url)
         {
             return DecodeN(DecipherSignature(url));
         }
 
-        public static Url DecodeN(Url url)
+        private Url DecodeN(Url url)
         {
             if (!url.QueryParams.TryGetFirst("n", out var n))
             {
                 return url;
             }
 
-            // Option 2
-            var nDecoded = Evaluate(N.Code, "n__", n);
+            var nDecoded = Evaluate(_nCode, n);
 
             return url.SetQueryParam("n", nDecoded);
         }
 
-
-        private static Url DecipherSignature(Url url)
+        private Url DecipherSignature(Url url)
         {
             if (!url.QueryParams.TryGetFirst("s", out var s))
             {
@@ -40,17 +42,15 @@ namespace YoutubeExplode.Extensions
             }
 
             var signatureParameter = url.QueryParams.FirstOrDefault("sp") as string ?? "signature";
-
-            // Option 2
-            var signatureValue = Evaluate(S.Code, "s__", s);
+            var signatureValue = Evaluate(_sCode, s);
 
             return url.SetQueryParam(signatureParameter, signatureValue);
         }
 
 
-        private static string Evaluate(string code, string argumentName, object argumentValue)
+        private string Evaluate((string code, string argumentName) x, object argumentValue)
         {
-            var finalCode = $"const {argumentName} = '{argumentValue}';{code}";
+            var finalCode = $"const {x.argumentName} = '{argumentValue}';{x.code}";
 
             return _engine.Evaluate(finalCode).ToString();
         }

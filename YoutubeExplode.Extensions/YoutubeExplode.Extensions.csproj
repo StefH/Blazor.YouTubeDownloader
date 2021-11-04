@@ -16,11 +16,8 @@
     <PackageReference Include="Flurl" Version="3.0.2" />
     <PackageReference Include="Jurassic" Version="3.2.4" />
     <PackageReference Include="Stef.Validation" Version="0.0.4" />
-    <!--<PackageReference Include="YoutubeExplode" Version="6.0.5" />-->
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\YoutubeExplode-master\YoutubeExplode\YoutubeExplode.csproj" />
+    <PackageReference Include="ExposedObject" Version="2.1.0" />
+    <PackageReference Include="YoutubeExplode" Version="6.0.5" />
   </ItemGroup>
 
 </Project>

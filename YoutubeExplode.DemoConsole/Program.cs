@@ -1,11 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using YoutubeExplode.Extensions;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
-using YouTubeUrlDecoder;
 
 namespace YoutubeExplode.DemoConsole
 {
@@ -13,13 +12,20 @@ namespace YoutubeExplode.DemoConsole
     {
         static async Task Main(string[] args)
         {
-            var httpClientForYoutubeClient = new HttpClient(new YouTubeCookieConsentHandler());
+            var httpClientForYoutubeClient = new HttpClient();
             var youtubeClient = new YoutubeClient(httpClientForYoutubeClient);
 
             var videoId = VideoId.Parse("https://www.youtube.com/watch?v=spVJOzF0EJ0");
 
-            // Get media streams & choose the best muxed stream
-            var streams = await youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+            var streamClient = youtubeClient.Videos.Streams;
+            //var streamClientExposed = Exposed.From(streamClient);
+
+            //var youtubeControllerExposed = Exposed.From(streamClientExposed._controller);
+            //var watchPageExposed = Exposed.From(Exposed.From(youtubeControllerExposed.GetVideoWatchPageAsync(videoId, CancellationToken.None)).Result);
+            //string playerSourceUrl = watchPageExposed.TryGetPlayerSourceUrl();
+            //string playerSource = await httpClientForYoutubeClient.GetStringAsync(playerSourceUrl);
+
+            var streams = await streamClient.GetManifestAndFixStreamUrlAsync(videoId);
             var streamInfo = streams.GetAudioOnlyStreams().TryGetWithHighestBitrate();
             if (streamInfo is null)
             {
@@ -30,20 +36,20 @@ namespace YoutubeExplode.DemoConsole
                 Console.WriteLine(streamInfo.Bitrate);
                 Console.WriteLine(streamInfo.Url);
 
-              //  YoutubeController _controller;
+                //  YoutubeController _controller;
 
 
-                var code = File.ReadAllText(@"C:\temp\base.js");
+                //var code = File.ReadAllText(@"C:\temp\base.js");
 
-                var fixedUrl = new UrlDescrambler2().Decode(code, streamInfo.Url);
-                Console.WriteLine(fixedUrl);
+              //  var fixedUrl = UrlDescrambler.Decode(playerSource, streamInfo.Url); //new UrlDescrambler2().Decode(playerSource, streamInfo.Url);
+                //Console.WriteLine(fixedUrl);
 
-                IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
+               // IStreamInfo fixedStreamInfo = new AudioOnlyStreamInfo(fixedUrl, streamInfo.Container, streamInfo.Size, streamInfo.Bitrate, fixedUrl);
 
 
                 Console.WriteLine("DownloadAsync start " + DateTime.Now);
                 //await youtubeClient.Videos.Streams.CopyToAsync(audio, destinationStream);
-                await youtubeClient.Videos.Streams.DownloadAsync(fixedStreamInfo, "c:\\temp\\x.webm");
+                await youtubeClient.Videos.Streams.DownloadAsync(streamInfo, "c:\\temp\\x.webm");
                 Console.WriteLine("DownloadAsync end " + DateTime.Now);
             }
         }
