@@ -51,7 +51,7 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             string url = req.Query["YouTubeUrl"].Single();
 
-            var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlAsync(url);
+            var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlsAsync(url);
 
             var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
 

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <TargetFrameworks>net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Description>Some extension methods for YoutubeExplode (IStreamInfo) which decodes the 'n' parameter from th eUrl to fix slow download.</Description>
     <Nullable>enable</Nullable>

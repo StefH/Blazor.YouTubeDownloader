@@ -10,7 +10,7 @@ namespace YoutubeExplode.Extensions
 {
     public static class StreamClientExtensions
     {
-        public static async ValueTask<StreamManifest> GetManifestAndFixStreamUrlAsync(this StreamClient streamClient, VideoId videoId, CancellationToken cancellationToken = default)
+        public static async ValueTask<StreamManifest> GetManifestAndFixStreamUrlsAsync(this StreamClient streamClient, VideoId videoId, CancellationToken cancellationToken = default)
         {
             var streamManifest = await streamClient.GetManifestAsync(videoId, cancellationToken);
             var playerSource = await streamClient.DownloadPlayerSourceAsync(videoId, cancellationToken);
