@@ -1,6 +1,4 @@
-﻿using YoutubeExplode.Extensions.Extensions;
-
-namespace YoutubeExplode.Extensions.Utils
+﻿namespace YoutubeExplode.Extensions.Utils
 {
     /// <summary>
     /// Based on https://github.com/fent/node-ytdl-core/pull/1022

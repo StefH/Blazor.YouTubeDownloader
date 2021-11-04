@@ -23,7 +23,7 @@ namespace YoutubeExplode.Extensions
             return streamManifest;
         }
 
-        public static Task<string> DownloadPlayerSourceAsync(this StreamClient streamClient, VideoId videoId, CancellationToken cancellationToken = default)
+        private static Task<string> DownloadPlayerSourceAsync(this StreamClient streamClient, VideoId videoId, CancellationToken cancellationToken = default)
         {
             var streamClientExposed = Exposed.From(streamClient);
             HttpClient httpClient = streamClientExposed._httpClient;

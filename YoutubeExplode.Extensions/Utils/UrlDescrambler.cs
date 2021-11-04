@@ -47,7 +47,6 @@ namespace YoutubeExplode.Extensions.Utils
             return url.SetQueryParam(signatureParameter, signatureValue);
         }
 
-
         private string Evaluate((string code, string argumentName) x, object argumentValue)
         {
             var finalCode = $"const {x.argumentName} = '{argumentValue}';{x.code}";
