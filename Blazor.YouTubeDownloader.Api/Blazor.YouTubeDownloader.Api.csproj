@@ -16,13 +16,13 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.0.5" />
+    <PackageReference Include="YoutubeExplode" Version="6.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
     <ProjectReference Include="..\System.Text.Json.Extensions\System.Text.Json.Extensions.csproj" />
-    <ProjectReference Include="..\YoutubeExplode.Extensions\YoutubeExplode.Extensions.csproj" />
+    <!--<ProjectReference Include="..\YoutubeExplode.Extensions\YoutubeExplode.Extensions.csproj" />-->
   </ItemGroup>
 
   <ItemGroup>

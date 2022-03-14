@@ -12,7 +12,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using YoutubeExplode;
-using YoutubeExplode.Extensions;
 using YoutubeExplode.Videos.Streams;
 
 namespace Blazor.YouTubeDownloader.Api.Functions
@@ -51,7 +50,8 @@ namespace Blazor.YouTubeDownloader.Api.Functions
 
             string url = req.Query["YouTubeUrl"].Single();
 
-            var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlsAsync(url);
+            //var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlsAsync(url);
+            var manifest = await _client.Videos.Streams.GetManifestAsync(url);
 
             var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
 

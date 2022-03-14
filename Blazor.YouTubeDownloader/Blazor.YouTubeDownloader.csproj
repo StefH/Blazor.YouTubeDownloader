@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BlazorDownloadFileFast" Version="0.0.4" />
+    <PackageReference Include="BlazorDownloadFileFast" Version="0.2.0" />
     <PackageReference Include="Blazorise" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Bootstrap" Version="0.9.2.5" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="0.9.2.5" />
@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.11" PrivateAssets="all" />
     <PackageReference Include="RestEase" Version="1.5.5" />
     <PackageReference Include="System.Net.Http.Json" Version="5.0.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.0.5" />
+    <PackageReference Include="YoutubeExplode" Version="6.1.0" />
     <!--<PackageReference Include="Matroska.Muxer" Version="0.0.5" />-->
   </ItemGroup>
 
