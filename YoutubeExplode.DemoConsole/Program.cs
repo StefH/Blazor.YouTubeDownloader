@@ -2,7 +2,6 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using YoutubeExplode.Extensions;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
@@ -17,7 +16,7 @@ namespace YoutubeExplode.DemoConsole
 
             var videoId = VideoId.Parse("https://www.youtube.com/watch?v=spVJOzF0EJ0");
 
-            var streams = await youtubeClient.Videos.Streams.GetManifestAndFixStreamUrlsAsync(videoId);
+            var streams = await youtubeClient.Videos.Streams.GetManifestAsync(videoId);
             var streamInfo = streams.GetAudioOnlyStreams().TryGetWithHighestBitrate();
             if (streamInfo is null)
             {

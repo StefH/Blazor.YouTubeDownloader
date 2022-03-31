@@ -1,26 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-  </PropertyGroup>
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Dynamitey" Version="2.0.10.189" />
-    <PackageReference Include="ExposedObject" Version="2.1.0" />
-    <PackageReference Include="ImpromptuInterface" Version="7.0.1" />
-    <PackageReference Include="ReflectionMagic" Version="4.1.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="YoutubeExplode" Version="6.1.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
-    <ProjectReference Include="..\YoutubeExplode.Extensions\YoutubeExplode.Extensions.csproj" />
-    <ProjectReference Include="..\YouTubeUrlDecoder\YouTubeUrlDecoder.csproj" />
-  </ItemGroup>
-
-  <!--<ItemGroup>
-    <RuntimeHostConfigurationOption Include="System.Net.SocketsHttpHandler.Http3Support" Value="true" />
-  </ItemGroup>-->
-
+    <ItemGroup>
+        <ProjectReference Include="..\Blazor.YouTubeDownloader.Shared\Blazor.YouTubeDownloader.Shared.csproj" />
+        <ProjectReference Include="..\YouTubeUrlDecoder\YouTubeUrlDecoder.csproj" />
+    </ItemGroup>
 
 </Project>
