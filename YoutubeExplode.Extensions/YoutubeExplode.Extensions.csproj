@@ -5,7 +5,7 @@
     <TargetFrameworks>net461;netstandard2.0;netstandard2.1</TargetFrameworks>
     <Description>Some extension methods for YoutubeExplode (IStreamInfo) which decodes the 'n' parameter from the Url to fix slow download.</Description>
     <Nullable>enable</Nullable>
-    <LangVersion>11</LangVersion>
+    <LangVersion>10</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
