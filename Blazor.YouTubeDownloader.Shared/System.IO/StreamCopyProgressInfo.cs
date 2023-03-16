@@ -1,4 +1,5 @@
-﻿namespace System.IO
+﻿// ReSharper disable once CheckNamespace
+namespace System.IO
 {
     public struct StreamCopyProgressInfo
     {

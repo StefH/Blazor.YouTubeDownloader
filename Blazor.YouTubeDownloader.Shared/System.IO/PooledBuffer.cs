@@ -1,5 +1,6 @@
 ﻿using System.Buffers;
 
+// ReSharper disable once CheckNamespace
 namespace System.IO
 {
     // Copied from https://github.com/Tyrrrz/YoutubeExplode
