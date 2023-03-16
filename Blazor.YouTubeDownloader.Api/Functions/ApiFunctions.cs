@@ -14,91 +14,98 @@ using Microsoft.Extensions.Logging;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
-namespace Blazor.YouTubeDownloader.Api.Functions;
-
-internal class ApiFunctions
+namespace Blazor.YouTubeDownloader.Api.Functions
 {
-    private readonly ILogger<ApiFunctions> _logger;
-    private readonly YoutubeClient _client;
-    private readonly IHttpClientFactory _factory;
-    private readonly ISerializer _serializer;
-
-    public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory, ISerializer serializer)
+    internal class ApiFunctions
     {
-        _logger = logger;
-        _client = client;
-        _factory = factory;
-        _serializer = serializer;
-    }
+        private readonly ILogger<ApiFunctions> _logger;
+        private readonly YoutubeClient _client;
+        private readonly IHttpClientFactory _factory;
+        private readonly ISerializer _serializer;
 
-    [FunctionName("GetVideoMetaData")]
-    public async Task<IActionResult> GetVideoMetaDataAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
-    {
-        _logger.LogInformation("HttpTrigger - GetVideoMetaDataAsync");
+        public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory,
+            ISerializer serializer)
+        {
+            _logger = logger;
+            _client = client;
+            _factory = factory;
+            _serializer = serializer;
+        }
 
-        string url = req.Query["YouTubeUrl"].Single();
+        [FunctionName("GetVideoMetaData")]
+        public async Task<IActionResult> GetVideoMetaDataAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetVideoMetaDataAsync");
 
-        var videoMetaData = await _client.Videos.GetAsync(url);
+            var url = req.Query["YouTubeUrl"].Single();
 
-        return new SystemTextJsonResult(videoMetaData, new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
-    }
+            var videoMetaData = await _client.Videos.GetAsync(url);
 
-    [FunctionName("GetAudioOnlyStreams")]
-    public async Task<IActionResult> GetAudioOnlyStreamsAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
-    {
-        _logger.LogInformation("HttpTrigger - GetAudioOnlyStreamsAsync");
+            return new SystemTextJsonResult(videoMetaData,
+                new JsonSerializerOptions { Converters = { new JsonTimeSpanConverter() } });
+        }
 
-        string url = req.Query["YouTubeUrl"].Single();
+        [FunctionName("GetAudioOnlyStreams")]
+        public async Task<IActionResult> GetAudioOnlyStreamsAsync(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetAudioOnlyStreamsAsync");
 
-        //var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlsAsync(url);
-        var manifest = await _client.Videos.Streams.GetManifestAsync(url);
+            var url = req.Query["YouTubeUrl"].Single();
 
-        var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
+            //var manifest = await _client.Videos.Streams.GetManifestAndFixStreamUrlsAsync(url);
+            var manifest = await _client.Videos.Streams.GetManifestAsync(url);
 
-        return new SystemTextJsonResult(audioStreams);
-    }
+            var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate);
 
-    [FunctionName("GetAudioStream")]
-    public async Task<Stream> GetAudioStreamAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {
-        _logger.LogInformation("HttpTrigger - GetAudioStreamAsync");
+            return new SystemTextJsonResult(audioStreams);
+        }
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        [FunctionName("GetAudioStream")]
+        public async Task<Stream> GetAudioStreamAsync(
+            [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetAudioStreamAsync");
 
-        return await _client.Videos.Streams.GetAsync(streamInfo);
-    }
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-    [FunctionName("GetOggOpusAudioStream")]
-    public async Task<Stream> GetOggOpusAudioStreamAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {
-        _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync");
+            return await _client.Videos.Streams.GetAsync(streamInfo);
+        }
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        [FunctionName("GetOggOpusAudioStream")]
+        public async Task<Stream> GetOggOpusAudioStreamAsync(
+            [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync");
 
-        var destinationStream = new MemoryStream();
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-        await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            var destinationStream = new MemoryStream();
 
-        destinationStream.Position = 0;
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
 
-        var oggOpusStream = new MemoryStream();
-        MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, oggOpusStream);
+            destinationStream.Position = 0;
 
-        oggOpusStream.Position = 0;
-        return oggOpusStream;
-    }
+            var oggOpusStream = new MemoryStream();
+            MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, oggOpusStream);
 
-    [FunctionName("GetAudioBytes")]
-    public async Task<byte[]> GetAudioBytesAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
-    {
-        _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
+            oggOpusStream.Position = 0;
+            return oggOpusStream;
+        }
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        [FunctionName("GetAudioBytes")]
+        public async Task<byte[]> GetAudioBytesAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
+        {
+            _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
-        await using var destinationStream = new MemoryStream();
+            var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
 
-        await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+            await using var destinationStream = new MemoryStream();
 
-        return destinationStream.ToArray();
+            await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+
+            return destinationStream.ToArray();
+        }
     }
 }

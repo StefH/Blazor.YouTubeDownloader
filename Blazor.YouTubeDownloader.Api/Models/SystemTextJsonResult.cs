@@ -1,21 +1,22 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Blazor.YouTubeDownloader.Api.Models;
-
-public class SystemTextJsonResult : ContentResult
+namespace Blazor.YouTubeDownloader.Api.Models
 {
-    private const string ContentTypeApplicationJson = "application/json";
-
-    //public SystemTextJsonResult(object value, ISerializer serializer)
-    //{
-    //    ContentType = ContentTypeApplicationJson;
-    //    Content = serializer.Serialize(value);
-    //}
-
-    public SystemTextJsonResult(object value, JsonSerializerOptions? options = null)
+    public class SystemTextJsonResult : ContentResult
     {
-        ContentType = ContentTypeApplicationJson;
-        Content = options == null ? JsonSerializer.Serialize(value) : JsonSerializer.Serialize(value, options);
+        private const string ContentTypeApplicationJson = "application/json";
+
+        //public SystemTextJsonResult(object value, ISerializer serializer)
+        //{
+        //    ContentType = ContentTypeApplicationJson;
+        //    Content = serializer.Serialize(value);
+        //}
+
+        public SystemTextJsonResult(object value, JsonSerializerOptions? options = null)
+        {
+            ContentType = ContentTypeApplicationJson;
+            Content = options == null ? JsonSerializer.Serialize(value) : JsonSerializer.Serialize(value, options);
+        }
     }
 }
