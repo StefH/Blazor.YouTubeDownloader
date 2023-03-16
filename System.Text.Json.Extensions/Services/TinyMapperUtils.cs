@@ -1,25 +1,26 @@
 ﻿using System.Text.Json.Serialization;
 using Nelibur.ObjectMapper;
 
-namespace System.Text.Json.Extensions.Services;
-
-internal sealed class TinyMapperUtils
+namespace System.Text.Json.Extensions.Services
 {
-    public static TinyMapperUtils Instance { get; } = new();
-
-    private TinyMapperUtils()
+    internal sealed class TinyMapperUtils
     {
-        TinyMapper.Bind<JsonSerializerOptions, JsonSerializerOptions>();
-        TinyMapper.Bind<JsonConverter, JsonConverter>();
-    }
+        public static TinyMapperUtils Instance { get; } = new TinyMapperUtils();
 
-    public void Map<TSource, TTarget>(TSource source, TTarget target)
-    {
-        TinyMapper.Map(source, target);
-    }
+        private TinyMapperUtils()
+        {
+            TinyMapper.Bind<JsonSerializerOptions, JsonSerializerOptions>();
+            TinyMapper.Bind<JsonConverter, JsonConverter>();
+        }
 
-    public T Map<T>(T source)
-    {
-        return TinyMapper.Map<T>(source);
+        public void Map<TSource, TTarget>(TSource source, TTarget target)
+        {
+            TinyMapper.Map(source, target);
+        }
+
+        public T Map<T>(T source)
+        {
+            return TinyMapper.Map<T>(source);
+        }
     }
 }

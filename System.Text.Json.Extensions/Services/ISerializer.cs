@@ -1,11 +1,12 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace System.Text.Json.Extensions.Services;
-
-public interface ISerializer
+namespace System.Text.Json.Extensions.Services
 {
-    string Serialize(object value);
+    public interface ISerializer
+    {
+        string Serialize(object value);
 
-    ValueTask<T?> DeserializeAsync<T>(Stream stream) where T : class;        
+        ValueTask<T?> DeserializeAsync<T>(Stream stream) where T : class;
+    }
 }
