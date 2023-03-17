@@ -1,8 +1,15 @@
 {
   "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet-isolated"
+  },
   "Serilog": {
     "MinimumLevel": {
       "Default": "Information"
     }
+  },
+  "Host": {
+    "CORS": "*"
   }
 }

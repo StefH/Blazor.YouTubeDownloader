@@ -33,8 +33,6 @@ builder.ConfigureServices(serviceCollection =>
     });
 
     serviceCollection.AddHttpClient();
-
-    // serviceCollection.AddSingleton<ISerializer, Serializer>();
 });
 
 var host = builder

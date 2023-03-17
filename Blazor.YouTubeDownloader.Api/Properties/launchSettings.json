@@ -1,8 +1,9 @@
 {
   "profiles": {
-    "Api": {
+    "FunctionAppIsolated": {
       "commandName": "Project",
-      "commandLineArgs": "start --cors *"
+      "commandLineArgs": "--port 7034",
+      "launchBrowser": false
     }
   }
 }
