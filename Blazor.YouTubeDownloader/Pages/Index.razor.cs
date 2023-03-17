@@ -13,186 +13,185 @@ using Microsoft.AspNetCore.Components;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
-namespace Blazor.YouTubeDownloader.Pages
+namespace Blazor.YouTubeDownloader.Pages;
+
+public partial class Index
 {
-    public partial class Index
+    private static int NoSelection = -1;
+
+    [Inject] 
+    public IYouTubeDownloadApi YouTubeDownloadApi { get; set; } = null!;
+
+    [Inject]
+    public IBlazorDownloadFileService BlazorDownloadFileService { get; set; } = null!;
+
+    public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
+
+    public bool ProcessYouTubeUrlButtonEnabled = true;
+
+    public bool DownloadButtonEnabled;
+
+    public bool OpusAudioStreamPresent;
+
+    public bool ExtractOpus;
+
+    public Video? VideoMetaData;
+
+    public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
+
+    public int CheckedAudioOnlyStreamInfoHashCode; // Workaround for https://github.com/stsrki/Blazorise/issues/1635        
+
+    public long Progress;
+
+    async Task ProcessYouTubeUrlAsync()
     {
-        private static int NoSelection = -1;
+        VideoMetaData = null;
+        AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
+        CheckedAudioOnlyStreamInfoHashCode = NoSelection;
+        ProcessYouTubeUrlButtonEnabled = false;
+        DownloadButtonEnabled = false;
+        Progress = 0;
+        OpusAudioStreamPresent = false;
+        ExtractOpus = false;
 
-        [Inject]
-        public IYouTubeDownloadApi YouTubeDownloadApi { get; set; }
-
-        [Inject]
-        public IBlazorDownloadFileService BlazorDownloadFileService { get; set; }
-
-        public string YouTubeUrl { get; set; } = "https://www.youtube.com/watch?v=spVJOzF0EJ0";
-
-        public bool ProcessYouTubeUrlButtonEnabled = true;
-
-        public bool DownloadButtonEnabled;
-
-        public bool OpusAudioStreamPresent;
-
-        public bool ExtractOpus;
-
-        public Video? VideoMetaData;
-
-        public IEnumerable<AudioOnlyStreamInfo> AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
-
-        public int CheckedAudioOnlyStreamInfoHashCode; // Workaround for https://github.com/stsrki/Blazorise/issues/1635        
-
-        public long Progress;
-
-        async Task ProcessYouTubeUrlAsync()
+        try
         {
-            VideoMetaData = null;
-            AudioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
-            CheckedAudioOnlyStreamInfoHashCode = NoSelection;
-            ProcessYouTubeUrlButtonEnabled = false;
-            DownloadButtonEnabled = false;
-            Progress = 0;
-            OpusAudioStreamPresent = false;
-            ExtractOpus = false;
+            var taskVideoMetaData = YouTubeDownloadApi.GetVideoMetaDataAsync(YouTubeUrl);
+            var taskAudioOnlyStreamInfos = YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
 
-            try
-            {
-                var taskVideoMetaData = YouTubeDownloadApi.GetVideoMetaDataAsync(YouTubeUrl);
-                var taskAudioOnlyStreamInfos = YouTubeDownloadApi.GetAudioOnlyStreamsAsync(YouTubeUrl);
+            await Task.WhenAll(taskVideoMetaData, taskAudioOnlyStreamInfos);
 
-                await Task.WhenAll(taskVideoMetaData, taskAudioOnlyStreamInfos);
+            VideoMetaData = await taskVideoMetaData;
+            AudioOnlyStreamInfos = (await taskAudioOnlyStreamInfos).ToArray();
 
-                VideoMetaData = await taskVideoMetaData;
-                AudioOnlyStreamInfos = await taskAudioOnlyStreamInfos;
+            var highest = AudioOnlyStreamInfos.TryGetWithHighestBitrate();
+            CheckedAudioOnlyStreamInfoHashCode = highest?.GetHashCode() ?? NoSelection;
+            OpusAudioStreamPresent = AudioOnlyStreamInfos.Any(a => a.IsOpus());
+            ExtractOpus = OpusAudioStreamPresent;
+        }
+        finally
+        {
+            DownloadButtonEnabled = true;
+            ProcessYouTubeUrlButtonEnabled = true;
+        }
+    }
 
-                var highest = AudioOnlyStreamInfos.TryGetWithHighestBitrate();
-                CheckedAudioOnlyStreamInfoHashCode = highest?.GetHashCode() ?? NoSelection;
-                OpusAudioStreamPresent = AudioOnlyStreamInfos.Any(a => a.IsOpus());
-                ExtractOpus = OpusAudioStreamPresent;
-            }
-            finally
-            {
-                DownloadButtonEnabled = true;
-                ProcessYouTubeUrlButtonEnabled = true;
-            }
+    void OnAudioOnlyStreamCheckedValueChanged(int value)
+    {
+        CheckedAudioOnlyStreamInfoHashCode = value;
+
+        var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == value);
+        OpusAudioStreamPresent = streamInfo.IsOpus();
+    }
+
+    async Task DownloadFileAsync()
+    {
+        if (CheckedAudioOnlyStreamInfoHashCode == NoSelection)
+        {
+            return;
         }
 
-        void OnAudioOnlyStreamCheckedValueChanged(int value)
-        {
-            CheckedAudioOnlyStreamInfoHashCode = value;
+        Progress = 0;
+        DownloadButtonEnabled = false;
 
-            var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == value);
-            OpusAudioStreamPresent = streamInfo.IsOpus();
-        }
-
-        async Task DownloadFileAsync()
+        try
         {
-            if (CheckedAudioOnlyStreamInfoHashCode == NoSelection)
+            var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
+
+            var stopwatch = new Stopwatch();
+
+            stopwatch.Reset();
+            stopwatch.Start();
+
+            // bool oggOpusIsExtractedByServer = false;
+            Stream stream;
+            if (streamInfo.IsOpus() && ExtractOpus)
             {
-                return;
+                stream = await YouTubeDownloadApi.GetOggOpusAudioStreamAsync(streamInfo);
+                // oggOpusIsExtractedByServer = true;
+                stopwatch.Stop();
+                Console.WriteLine("GetOggOpusAudioStreamAsync = " + stopwatch.Elapsed);
+            }
+            else
+            {
+                stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
+                stopwatch.Stop();
+                Console.WriteLine("GetAudioStreamAsync = " + stopwatch.Elapsed);
             }
 
-            Progress = 0;
-            DownloadButtonEnabled = false;
+            var filename = GetFileNameWithExtension(streamInfo);
 
-            try
+            stopwatch.Reset();
+            stopwatch.Start();
+            using var memoryStream = new MemoryStream();
+
+            long lastValue = 0;
+            await stream.CopyToAsync(memoryStream, async (e) =>
             {
-                var streamInfo = AudioOnlyStreamInfos.Single(x => x.GetHashCode() == CheckedAudioOnlyStreamInfoHashCode);
+                Progress = 100 * e.TotalBytesRead / e.SourceLength;
 
-                var x = new Stopwatch();
-
-                x.Reset();
-                x.Start();
-
-                // bool oggOpusIsExtractedByServer = false;
-                Stream stream;
-                if (streamInfo.IsOpus() && ExtractOpus)
+                if (Progress != lastValue)
                 {
-                    stream = await YouTubeDownloadApi.GetOggOpusAudioStreamAsync(streamInfo);
-                    // oggOpusIsExtractedByServer = true;
-                    x.Stop();
-                    Console.WriteLine("GetOggOpusAudioStreamAsync = " + x.Elapsed);
+                    lastValue = Progress;
+                    StateHasChanged();
+                    await Task.Delay(5); // give the UI some time to catch up
                 }
-                else
-                {
-                    stream = await YouTubeDownloadApi.GetAudioStreamAsync(streamInfo);
-                    x.Stop();
-                    Console.WriteLine("GetAudioStreamAsync = " + x.Elapsed);
-                }
+            });
+            stopwatch.Stop();
+            Console.WriteLine("CopyToAsync = " + stopwatch.Elapsed);
 
-                var filename = GetFileNameWithExtension(streamInfo);
+            //byte[] array;
+            //if (OpusAudioStreamPresent && ExtractOpus && !oggOpusIsExtractedByServer)
+            //{
+            //    using var opusStream = new MemoryStream();
 
-                x.Reset();
-                x.Start();
-                using var memoryStream = new MemoryStream();
+            //    x.Start();
+            //    memoryStream.Position = 0;
+            //    MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
 
-                long lastValue = 0;
-                await stream.CopyToAsync(memoryStream, async (e) =>
-                {
-                    Progress = 100 * e.TotalBytesRead / e.SourceLength;
+            //    Console.WriteLine("ExtractOggOpusAudio and ToArray = " + x.Elapsed);
 
-                    if (Progress != lastValue)
-                    {
-                        lastValue = Progress;
-                        StateHasChanged();
-                        await Task.Delay(5); // give the UI some time to catch up
-                    }
-                });
-                x.Stop();
-                Console.WriteLine("CopyToAsync = " + x.Elapsed);
+            //    array = opusStream.ToArray();
+            //    x.Stop();
+            //}
+            //else
+            //{
+            //    x.Start();
+            //    array = memoryStream.ToArray();
+            //    x.Stop();
+            //    Console.WriteLine("ToArray = " + x.Elapsed);
+            //}
 
-                //byte[] array;
-                //if (OpusAudioStreamPresent && ExtractOpus && !oggOpusIsExtractedByServer)
-                //{
-                //    using var opusStream = new MemoryStream();
+            stopwatch.Reset();
+            stopwatch.Start();
+            byte[] array = memoryStream.ToArray();
+            stopwatch.Stop();
+            Console.WriteLine("ToArray = " + stopwatch.Elapsed);
 
-                //    x.Start();
-                //    memoryStream.Position = 0;
-                //    MatroskaDemuxer.ExtractOggOpusAudio(memoryStream, opusStream);
+            stopwatch.Reset();
+            stopwatch.Start();
+            await BlazorDownloadFileService.DownloadFileAsync(filename, array);
+            stopwatch.Stop();
 
-                //    Console.WriteLine("ExtractOggOpusAudio and ToArray = " + x.Elapsed);
-
-                //    array = opusStream.ToArray();
-                //    x.Stop();
-                //}
-                //else
-                //{
-                //    x.Start();
-                //    array = memoryStream.ToArray();
-                //    x.Stop();
-                //    Console.WriteLine("ToArray = " + x.Elapsed);
-                //}
-
-                x.Reset();
-                x.Start();
-                byte[] array = memoryStream.ToArray();
-                x.Stop();
-                Console.WriteLine("ToArray = " + x.Elapsed);
-
-                x.Reset();
-                x.Start();
-                await BlazorDownloadFileService.DownloadFileAsync(filename, array);
-                x.Stop();
-
-                Console.WriteLine("Download = " + x.Elapsed);
-            }
-            finally
-            {
-                DownloadButtonEnabled = true;
-            }
+            Console.WriteLine("Download = " + stopwatch.Elapsed);
         }
-
-        private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
+        finally
         {
-            string extension = streamInfo.IsOpus() && ExtractOpus ? "opus" : streamInfo.Container.Name;
-
-            string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
-
-            return $"{fileName}.{extension}";
+            DownloadButtonEnabled = true;
         }
+    }
 
-        private static string GetSafeFileName(string fileName)
-        {
-            return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
-        }
+    private string GetFileNameWithExtension(AudioOnlyStreamInfo streamInfo)
+    {
+        string extension = streamInfo.IsOpus() && ExtractOpus ? "opus" : streamInfo.Container.Name;
+
+        string fileName = GetSafeFileName(VideoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(YouTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
+
+        return $"{fileName}.{extension}";
+    }
+
+    private static string GetSafeFileName(string fileName)
+    {
+        return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
     }
 }
