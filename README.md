@@ -3,7 +3,7 @@
 Example Blazor WebAssemblyApp to download the Audio from a YouTube video
 
 ## Example
-[Blazor.YouTubeDownloader Static Web App](https://thankful-mushroom-0324ec803.azurestaticapps.net/)
+[Blazor.YouTubeDownloader Static Web App](https://gray-pond-0ac641403.2.azurestaticapps.net)
 
 
 ## Uses
