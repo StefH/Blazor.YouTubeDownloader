@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 namespace System.Text.Json
 {
     // https://github.com/dotnet/runtime/issues/29895
-    public class ImmutableConverter : JsonConverter<object>
+    public class ImmutableConverter<T> : JsonConverter<T>
     {
         public override bool CanConvert(Type typeToConvert)
         {
@@ -32,7 +32,7 @@ namespace System.Text.Json
                     foreach (var parameter in parameters)
                     {
                         var hasMatchingProperty =
-                            properties.Any(p => NameOfPropertyAndParameter.Matches(p.Name, parameter.Name));
+                            properties.Any(p => NameOfPropertyAndParameterOrg.Matches(p.Name, parameter.Name));
                         if (!hasMatchingProperty)
                         {
                             result = false;
@@ -49,7 +49,7 @@ namespace System.Text.Json
             return result;
         }
 
-        public override object Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override T Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var valueOfProperty = new Dictionary<PropertyInfo, object>();
             var namedPropertiesMapping = GetNamedProperties(options, GetProperties(typeToConvert));
@@ -61,7 +61,7 @@ namespace System.Text.Json
                     break;
                 }
 
-                var jsonPropName = reader.GetString();
+                var jsonPropName = reader.GetString()!;
                 var normalizedPropName = ConvertAndNormalizeName(jsonPropName, options);
                 if (!namedPropertiesMapping.TryGetValue(normalizedPropName, out var obProp))
                 {
@@ -71,7 +71,7 @@ namespace System.Text.Json
                 {
                     var value = JsonSerializer.Deserialize(ref reader, obProp.PropertyType, options);
                     reader.Read();
-                    valueOfProperty[obProp] = value;
+                    valueOfProperty[obProp] = value!;
                 }
             }
 
@@ -82,20 +82,20 @@ namespace System.Text.Json
             {
                 var parameterInfo = parameters[index];
                 var value = valueOfProperty
-                    .First(prop => NameOfPropertyAndParameter.Matches(prop.Key.Name, parameterInfo.Name)).Value;
+                    .First(prop => NameOfPropertyAndParameterOrg.Matches(prop.Key.Name, parameterInfo.Name)).Value;
 
                 parameterValues[index] = value;
             }
 
-            return ctor.Invoke(parameterValues);
+            return (T)ctor.Invoke(parameterValues);
         }
 
-        public override void Write(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
         {
             var newOptions = TinyMapperUtils.Instance.Map(options);
             newOptions.Converters.Clear();
 
-            foreach (var c in options.Converters.Where(c => !(c is ImmutableConverter)))
+            foreach (var c in options.Converters.Where(c => !(c is ImmutableConverter<T>)))
             {
                 newOptions.Converters.Add(c);
             }
@@ -144,7 +144,7 @@ namespace System.Text.Json
         }
     }
 
-    internal static class NameOfPropertyAndParameter
+    internal static class NameOfPropertyAndParameterOrg
     {
         public static bool Matches(string? propertyName, string? parameterName)
         {
@@ -160,8 +160,7 @@ namespace System.Text.Json
 
             var xRight = propertyName.AsSpan(1);
             var yRight = parameterName.AsSpan(1);
-            return char.ToLowerInvariant(propertyName[0]).CompareTo(parameterName[0]) == 0 &&
-                   xRight.Equals(yRight, StringComparison.Ordinal);
+            return char.ToLowerInvariant(propertyName[0]).CompareTo(parameterName[0]) == 0 && xRight.Equals(yRight, StringComparison.Ordinal);
         }
     }
 }

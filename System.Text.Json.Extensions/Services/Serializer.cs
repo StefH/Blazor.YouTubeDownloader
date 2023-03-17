@@ -5,23 +5,45 @@ namespace System.Text.Json.Extensions.Services
 {
     public class Serializer : ISerializer
     {
-        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        public string Serialize<T>(T[] values)
         {
-            Converters =
+            var jsonSerializerOptions = new JsonSerializerOptions
             {
-                new JsonTimeSpanConverter(),
-                new ImmutableConverter()
-            }
-        };
+                Converters =
+                {
+                    new JsonTimeSpanConverter(),
+                    new ImmutableConverter<T>()
+                }
+            };
 
-        public string Serialize(object value)
+            return JsonSerializer.Serialize(values, jsonSerializerOptions);
+        }
+
+        public string Serialize<T>(T value)
         {
-            return JsonSerializer.Serialize(value, _jsonSerializerOptions);
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Converters =
+                {
+                    new JsonTimeSpanConverter(),
+                    new ImmutableConverter<T>()
+                }
+            };
+
+            return JsonSerializer.Serialize(value, jsonSerializerOptions);
         }
 
         public ValueTask<T?> DeserializeAsync<T>(Stream stream) where T : class
         {
-            return JsonSerializer.DeserializeAsync<T>(stream, _jsonSerializerOptions);
+            var jsonSerializerOptions = new JsonSerializerOptions
+            {
+                Converters =
+                {
+                    new JsonTimeSpanConverter(),
+                    new ImmutableConverter<T>()
+                }
+            };
+            return JsonSerializer.DeserializeAsync<T>(stream, jsonSerializerOptions);
         }
     }
 }

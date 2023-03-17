@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 // ReSharper disable once CheckNamespace
 namespace System.Text.Json
 {
-// Copied from https://github.com/smokedlinq/Extensions.System.Text.Json/
+    // Copied from https://github.com/smokedlinq/Extensions.System.Text.Json/
     public class JsonTimeSpanConverter : JsonConverterFactory
     {
         public override bool CanConvert(Type typeToConvert)

@@ -8,5 +8,8 @@
     "MinimumLevel": {
       "Default": "Information"
     }
+  },
+  "Host": {
+    "CORS": "*"
   }
 }
