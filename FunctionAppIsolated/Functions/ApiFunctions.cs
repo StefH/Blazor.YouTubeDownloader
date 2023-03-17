@@ -1,9 +1,9 @@
-using System.Text.Json.Extensions.Services;
 using System.Web;
 using Matroska.Muxer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -13,35 +13,46 @@ internal class ApiFunctions
 {
     private const string ContentTypeApplicationJson = "application/json";
 
+    //private readonly ILogger<ApiFunctions> _logger;
+    //private readonly YoutubeClient _client;
+    //private readonly IHttpClientFactory _factory;
+    //private readonly ISerializer _serializer;
+
+    //public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory, ISerializer serializer)
+    //{
+    //    _logger = logger;
+    //    _client = client;
+    //    _factory = factory;
+    //    _serializer = serializer;
+    //}
+
     private readonly ILogger<ApiFunctions> _logger;
     private readonly YoutubeClient _client;
     private readonly IHttpClientFactory _factory;
-    private readonly ISerializer _serializer;
 
-    public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory, ISerializer serializer)
+    public ApiFunctions(ILogger<ApiFunctions> logger, YoutubeClient client, IHttpClientFactory factory)
     {
         _logger = logger;
         _client = client;
         _factory = factory;
-        _serializer = serializer;
     }
 
-    private async Task<HttpResponseData> CreateJsonResponseAsync<T>(HttpRequestData req, T[] values)
-    {
-        var response = req.CreateResponse();
-        response.Headers.Add("Content-Type", ContentTypeApplicationJson);
+    //private async Task<HttpResponseData> CreateJsonResponseAsync<T>(HttpRequestData req, T[] values)
+    //{
+    //    var response = req.CreateResponse();
+    //    response.Headers.Add("Content-Type", ContentTypeApplicationJson);
 
-        await response.WriteStringAsync(_serializer.Serialize(values));
+    //    await response.WriteStringAsync(_serializer.Serialize(values));
 
-        return response;
-    }
+    //    return response;
+    //}
 
     private async Task<HttpResponseData> CreateJsonResponseAsync<T>(HttpRequestData req, T value)
     {
         var response = req.CreateResponse();
         response.Headers.Add("Content-Type", ContentTypeApplicationJson);
 
-        await response.WriteStringAsync(_serializer.Serialize(value));
+        await response.WriteStringAsync(JsonConvert.SerializeObject(value));
 
         return response;
     }
@@ -90,9 +101,11 @@ internal class ApiFunctions
     {
         _logger.LogInformation("HttpTrigger - GetAudioStreamAsync");
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        var body = await req.ReadAsStringAsync();
 
-        return await _client.Videos.Streams.GetAsync(streamInfo);
+        var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
+
+        return await _client.Videos.Streams.GetAsync(streamInfo!);
     }
 
     [Function("GetOggOpusAudioStream")]
@@ -101,11 +114,18 @@ internal class ApiFunctions
     {
         _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync");
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        //var extra = new List<JsonConverter>
+        //{
+        //    new ImmutableConverter<Container>()
+        //};
+
+        var body = await req.ReadAsStringAsync();
+
+        var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
 
         var destinationStream = new MemoryStream();
 
-        await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+        await _client.Videos.Streams.CopyToAsync(streamInfo!, destinationStream);
 
         destinationStream.Position = 0;
 
@@ -121,11 +141,13 @@ internal class ApiFunctions
     {
         _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
-        var streamInfo = await _serializer.DeserializeAsync<AudioOnlyStreamInfo>(req.Body);
+        var body = await req.ReadAsStringAsync();
+
+        var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
 
         await using var destinationStream = new MemoryStream();
 
-        await _client.Videos.Streams.CopyToAsync(streamInfo, destinationStream);
+        await _client.Videos.Streams.CopyToAsync(streamInfo!, destinationStream);
 
         return destinationStream.ToArray();
     }

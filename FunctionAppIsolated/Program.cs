@@ -1,4 +1,3 @@
-using System.Text.Json.Extensions.Services;
 using Blazor.YouTubeDownloader.Api.HttpClientHandlers;
 using Microsoft.ApplicationInsights.Extensibility;
 using Microsoft.Extensions.Configuration;
@@ -35,7 +34,7 @@ builder.ConfigureServices(serviceCollection =>
 
     serviceCollection.AddHttpClient();
 
-    serviceCollection.AddSingleton<ISerializer, Serializer>();
+    // serviceCollection.AddSingleton<ISerializer, Serializer>();
 });
 
 var host = builder
