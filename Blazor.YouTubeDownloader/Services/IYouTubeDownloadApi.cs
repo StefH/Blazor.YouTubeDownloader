@@ -34,9 +34,9 @@ public interface IYouTubeDownloadApi
     [Post("GetOggOpusAudioStream")]
     public Task<Stream> GetOggOpusAudioStreamAsync([Body] AudioOnlyStreamInfo streamInfo);
 
-    /// <summary>
-    /// Returns the audio data for a specified audio-only stream as a byte array.
-    /// </summary>
-    [Post("GetAudioBytes")]
-    public Task<byte[]> GetAudioBytesAsync([Body] AudioOnlyStreamInfo streamInfo);
+    ///// <summary>
+    ///// Returns the audio data for a specified audio-only stream as a byte array.
+    ///// </summary>
+    //[Post("GetAudioBytes")]
+    //public Task<byte[]> GetAudioBytesAsync([Body] AudioOnlyStreamInfo streamInfo);
 }

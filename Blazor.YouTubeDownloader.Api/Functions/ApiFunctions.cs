@@ -1,4 +1,5 @@
 using System.Web;
+using Blazor.YouTubeDownloader.Api.Extensions;
 using Matroska.Muxer;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -11,8 +12,6 @@ namespace Blazor.YouTubeDownloader.Api.Functions;
 
 internal class ApiFunctions
 {
-    private const string ContentTypeApplicationJson = "application/json";
-
     private readonly ILogger<ApiFunctions> _logger;
     private readonly YoutubeClient _client;
 
@@ -32,7 +31,7 @@ internal class ApiFunctions
 
         var videoMetaData = await _client.Videos.GetAsync(url);
 
-        return await CreateJsonResponseAsync(req, videoMetaData);
+        return await req.CreateJsonResponseAsync(videoMetaData);
     }
 
 
@@ -49,11 +48,11 @@ internal class ApiFunctions
 
         var audioStreams = manifest.GetAudioOnlyStreams().OrderBy(a => a.Bitrate).ToArray();
 
-        return await CreateJsonResponseAsync(req, audioStreams);
+        return await req.CreateJsonResponseAsync(audioStreams);
     }
 
     [Function("GetAudioStream")]
-    public async Task<Stream> GetAudioStreamAsync(
+    public async Task<HttpResponseData> GetAudioStreamAsync(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
     {
         _logger.LogInformation("HttpTrigger - GetAudioStreamAsync");
@@ -62,11 +61,11 @@ internal class ApiFunctions
 
         var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
 
-        return await _client.Videos.Streams.GetAsync(streamInfo!);
+        return req.CreateStreamResponse(await _client.Videos.Streams.GetAsync(streamInfo!));
     }
 
     [Function("GetOggOpusAudioStream")]
-    public async Task<Stream> GetOggOpusAudioStreamAsync(
+    public async Task<HttpResponseData> GetOggOpusAudioStreamAsync(
         [HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
     {
         _logger.LogInformation("HttpTrigger - GetOggOpusAudioStreamAsync");
@@ -75,44 +74,31 @@ internal class ApiFunctions
 
         var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
 
-        var destinationStream = new MemoryStream();
-
+        using var destinationStream = new MemoryStream();
         await _client.Videos.Streams.CopyToAsync(streamInfo!, destinationStream);
-
         destinationStream.Position = 0;
 
         var oggOpusStream = new MemoryStream();
         MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, oggOpusStream);
 
-        oggOpusStream.Position = 0;
-        return oggOpusStream;
+        return req.CreateStreamResponse(oggOpusStream);
     }
 
-    [Function("GetAudioBytes")]
-    public async Task<byte[]> GetAudioBytesAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
-    {
-        _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
+    //[Function("GetAudioBytes")]
+    //public async Task<HttpResponseData> GetAudioBytesAsync([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequestData req)
+    //{
+    //    _logger.LogInformation("HttpTrigger - GetAudioBytesAsync");
 
-        var body = await req.ReadAsStringAsync();
+    //    var body = await req.ReadAsStringAsync();
 
-        var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
+    //    var streamInfo = JsonConvert.DeserializeObject<AudioOnlyStreamInfo>(body!);
 
-        await using var destinationStream = new MemoryStream();
+    //    await using var destinationStream = new MemoryStream();
 
-        await _client.Videos.Streams.CopyToAsync(streamInfo!, destinationStream);
+    //    await _client.Videos.Streams.CopyToAsync(streamInfo!, destinationStream);
 
-        return destinationStream.ToArray();
-    }
-
-    private static async Task<HttpResponseData> CreateJsonResponseAsync<T>(HttpRequestData req, T value)
-    {
-        var response = req.CreateResponse();
-        response.Headers.Add("Content-Type", ContentTypeApplicationJson);
-
-        await response.WriteStringAsync(JsonConvert.SerializeObject(value));
-
-        return response;
-    }
+    //    return destinationStream.ToArray();
+    //}
 
     private static string GetYouTubeUrlFromQuery(string query)
     {
