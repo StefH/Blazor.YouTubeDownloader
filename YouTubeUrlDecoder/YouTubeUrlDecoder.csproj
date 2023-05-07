@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Flurl" Version="3.0.2" />
+    <PackageReference Include="Flurl" Version="3.0.7" />
     <PackageReference Include="Jurassic" Version="3.2.4" />
   </ItemGroup>
 
