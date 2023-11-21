@@ -21,7 +21,7 @@
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.ApplicationInsights" Version="3.1.0" />
     <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.2.14" />
+    <PackageReference Include="YoutubeExplode" Version="6.3.7" />
   </ItemGroup>
 
   <ItemGroup>
