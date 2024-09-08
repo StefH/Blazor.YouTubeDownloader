@@ -28,7 +28,7 @@ jobs:
       - name: Deploy to Azure Static Web Apps
         env:
           SWA_CLI_DEPLOYMENT_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GRAY_POND_0AC641403 }}
-        run: swa deploy ./Client/publish --api-location ./Api/publish --env production
+        run: swa deploy --env production
 
       - name: Build And Deploy
         if: false

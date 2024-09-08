@@ -11,19 +11,31 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
 // HttpClient
 var baseAddress = builder.HostEnvironment.BaseAddress;
 Console.WriteLine("HostEnvironment.BaseAddress = " + baseAddress);
 
-bool isLocalHost = baseAddress.Contains("localhost");
+var isLocalHost = baseAddress.Contains("localhost");
 Console.WriteLine("isLocalHost = " + isLocalHost);
 
-bool isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtube-downloader.heyenrath.nl");
+var isRunningInSWA = bool.TryParse(Environment.GetEnvironmentVariable("SWA_CLI_ENV"), out var swa) && swa;
+
+var isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtube-downloader.heyenrath.nl");
 Console.WriteLine("isAzure = " + isAzure);
 
-string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
+string httpClientBaseAddress;
+if (isRunningInSWA)
+{
+    httpClientBaseAddress = "http://localhost:7071/";
+}
+else if (isLocalHost)
+{
+    httpClientBaseAddress = "http://localhost:7034/";
+}
+else
+{
+    httpClientBaseAddress = baseAddress;
+}
 Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
 
 builder.Services
@@ -52,7 +64,7 @@ builder.Services
 var host = builder.Build();
 
 //host.Services
-    //.UseBootstrapProviders()
-    //.UseFontAwesomeIcons();
+//.UseBootstrapProviders()
+//.UseFontAwesomeIcons();
 
 await host.RunAsync();
