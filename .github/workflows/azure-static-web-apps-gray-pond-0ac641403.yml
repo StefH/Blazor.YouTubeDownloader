@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - swa-net8
       - features/*
   pull_request:
     types: [opened, synchronize, reopened, closed]
