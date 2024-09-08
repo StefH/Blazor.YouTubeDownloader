@@ -18,7 +18,7 @@ Console.WriteLine("HostEnvironment.BaseAddress = " + baseAddress);
 var isLocalHost = baseAddress.Contains("localhost");
 Console.WriteLine("isLocalHost = " + isLocalHost);
 
-var isRunningInSWA = bool.TryParse(Environment.GetEnvironmentVariable("SWA_CLI_ENV"), out var swa) && swa;
+var isRunningInSWA = true; //bool.TryParse(Environment.GetEnvironmentVariable("SWA_CLI_ENV"), out var swa) && swa;
 
 var isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtube-downloader.heyenrath.nl");
 Console.WriteLine("isAzure = " + isAzure);

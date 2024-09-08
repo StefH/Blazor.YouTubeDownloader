@@ -3,7 +3,7 @@
     "blazor.you-tube-downloader": {
       "appLocation": "Blazor.YouTubeDownloader",
       "apiLocation": "Blazor.YouTubeDownloader.Api",
-      "outputLocation": "bin\\wwwroot",
+      "outputLocation": "bin/wwwroot",
       "apiLanguage": "dotnetisolated",
       "apiVersion": "6.0",
       "appBuildCommand": "dotnet publish -c Release -o bin",
