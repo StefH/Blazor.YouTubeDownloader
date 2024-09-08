@@ -23,7 +23,7 @@ Console.WriteLine("isLocalHost = " + isLocalHost);
 bool isAzure = baseAddress.Contains("azurestaticapps.net") || baseAddress.Contains("youtube-downloader.heyenrath.nl");
 Console.WriteLine("isAzure = " + isAzure);
 
-string httpClientBaseAddress = isLocalHost ? "http://localhost:7034/" : baseAddress;
+string httpClientBaseAddress = isLocalHost ? "http://localhost:7071/" : baseAddress;
 Console.WriteLine("httpClientBaseAddress = " + httpClientBaseAddress);
 
 builder.Services

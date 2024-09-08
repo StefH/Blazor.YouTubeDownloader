@@ -23,16 +23,7 @@ jobs:
 
       - name: Install SWA CLI
         run: npm install -g @azure/static-web-apps-cli
-      
-     
-      # Build the Blazor WebAssembly app
-      - name: Build Blazor WebAssembly App
-        run: dotnet publish ./Blazor.YouTubeDownloader/Blazor.YouTubeDownloader.csproj --configuration Release --output ./Client/publish
-      
-      # Build the ASP.NET Core API
-      - name: Build API
-        run: dotnet publish ./Blazor.YouTubeDownloader.Api/Blazor.YouTubeDownloader.Api.csproj --configuration Release --output ./Api/publish
-      
+
       # Deploy to Azure Static Web Apps using SWA CLI
       - name: Deploy to Azure Static Web Apps
         env:
