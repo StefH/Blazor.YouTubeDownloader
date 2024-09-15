@@ -1,6 +1,6 @@
 {
   "configurations": {
-    "blazor.you-tube-downloader": {
+    "blazor.youtube-downloader": {
       "appLocation": "Blazor.YouTubeDownloader",
       "apiLocation": "Blazor.YouTubeDownloader.Api",
       "outputLocation": "bin/wwwroot",
