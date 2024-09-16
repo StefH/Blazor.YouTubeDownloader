@@ -2,12 +2,10 @@
   "configurations": {
     "blazor.youtube-downloader": {
       "appLocation": "Blazor.YouTubeDownloader",
-      "apiLocation": "Blazor.YouTubeDownloader.Api",
+      "apiLocation": "api",
       "outputLocation": "bin/wwwroot",
       "apiLanguage": "dotnetisolated",
       "apiVersion": "8.0",
-      "appBuildCommand": "dotnet publish -c Release -o ../bin",
-      "apiBuildCommand": "dotnet publish -c Release -o ../api",
       "run": "dotnet watch run",
       "appDevserverUrl": "http://localhost:8000"
     }
