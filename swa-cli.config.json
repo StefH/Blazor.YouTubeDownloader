@@ -1,7 +1,7 @@
 {
   "configurations": {
     "blazor.youtube-downloader": {
-      "appLocation": "Blazor.YouTubeDownloader",
+      "appLocation": "app",
       "apiLocation": "api",
       "outputLocation": "bin/wwwroot",
       "apiLanguage": "dotnetisolated",
