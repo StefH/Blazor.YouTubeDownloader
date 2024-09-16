@@ -7,7 +7,7 @@
       "apiLanguage": "dotnetisolated",
       "apiVersion": "8.0",
       "appBuildCommand": "dotnet publish -c Release -o bin",
-      "apiBuildCommand": "dotnet publish -c Release",
+      "apiBuildCommand": "dotnet publish -c Release ../api",
       "run": "dotnet watch run",
       "appDevserverUrl": "http://localhost:8000"
     }
