@@ -21,11 +21,11 @@ jobs:
         with:
           submodules: true
 
-      - name: Build Blazor WASM App
-        run: dotnet publish ./Blazor.YouTubeDownloader/Blazor.YouTubeDownloader.csproj -c Release -o bin
+      # - name: Build Blazor WASM App
+      #   run: dotnet publish ./Blazor.YouTubeDownloader/Blazor.YouTubeDownloader.csproj -c Release -o bin
       
-      - name: Build API
-        run: dotnet publish ./Blazor.YouTubeDownloader.Api/Blazor.YouTubeDownloader.Api.csproj -c Release
+      # - name: Build API
+      #   run: dotnet publish ./Blazor.YouTubeDownloader.Api/Blazor.YouTubeDownloader.Api.csproj -c Release
       
       - name: Install SWA CLI
         run: npm install -g @azure/static-web-apps-cli
