@@ -1,46 +1,63 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
+using Matroska.Muxer;
+using YoutubeExplode.DemoConsole.Extensions;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
-namespace YoutubeExplode.DemoConsole
+namespace YoutubeExplode.DemoConsole;
+
+class Program
 {
-    class Program
+    static async Task Main(string[] args)
     {
-        static async Task Main(string[] args)
+        var httpClientForYoutubeClient = new HttpClient();
+        var youtubeClient = new YoutubeClient(httpClientForYoutubeClient);
+
+        var videoId = VideoId.Parse("https://www.youtube.com/watch?v=spVJOzF0EJ0");
+
+        // var videoMetaData = await youtubeClient.Videos.GetAsync(videoId);
+        var videoStreams = await youtubeClient.Videos.Streams.GetManifestAsync(videoId);
+        var highestAudioStreamInfo = videoStreams.GetAudioOnlyStreams().TryGetWithHighestBitrate();
+        if (highestAudioStreamInfo is null)
         {
-            var httpClientForYoutubeClient = new HttpClient();
-            var youtubeClient = new YoutubeClient(httpClientForYoutubeClient);
+            Console.WriteLine("This video has no AudioOnlyStreams");
+        }
+        else
+        {
+            Console.WriteLine(highestAudioStreamInfo.Bitrate);
+            Console.WriteLine(highestAudioStreamInfo.Url);
 
-            var videoId = VideoId.Parse("https://www.youtube.com/watch?v=spVJOzF0EJ0");
+            Console.WriteLine("DownloadAsync start " + DateTime.Now);
+            await youtubeClient.Videos.Streams.DownloadAsync(highestAudioStreamInfo, "c:\\temp\\x.webm");
+            Console.WriteLine("DownloadAsync end " + DateTime.Now);
 
-            var streams = await youtubeClient.Videos.Streams.GetManifestAsync(videoId);
-            var streamInfo = streams.GetAudioOnlyStreams().TryGetWithHighestBitrate();
-            if (streamInfo is null)
-            {
-                Console.WriteLine("This video has no AudioOnlyStreams");
-            }
-            else
-            {
-                Console.WriteLine(streamInfo.Bitrate);
-                Console.WriteLine(streamInfo.Url);
+            using var destinationStream = new MemoryStream();
+            await youtubeClient.Videos.Streams.CopyToAsync(highestAudioStreamInfo, destinationStream);
+            destinationStream.Position = 0;
 
-                Console.WriteLine("DownloadAsync start " + DateTime.Now);
-                await youtubeClient.Videos.Streams.DownloadAsync(streamInfo, "c:\\temp\\x.webm");
-                Console.WriteLine("DownloadAsync end " + DateTime.Now);
-            }
+            await using var oggOpusFileStream = new FileStream($"c:\\temp\\{GetSafeFileName("x")}.opus", FileMode.OpenOrCreate);
+            MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, oggOpusFileStream);
         }
     }
 
-    public class YouTubeCookieConsentHandler : HttpClientHandler
+    private static string GetSafeFileName(string fileName)
     {
-        public YouTubeCookieConsentHandler()
-        {
-            UseCookies = true;
-            CookieContainer = new CookieContainer();
-            CookieContainer.Add(new Cookie("CONSENT", "YES+cb", "/", "youtube.com"));
-        }
+        return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
+    }
+}
+
+public class YouTubeCookieConsentHandler : HttpClientHandler
+{
+    public YouTubeCookieConsentHandler()
+    {
+        UseCookies = true;
+        CookieContainer = new CookieContainer();
+        CookieContainer.Add(new Cookie("CONSENT", "YES+cb", "/", "youtube.com"));
     }
 }
