@@ -10,7 +10,7 @@
             <FieldBody ColumnSize="ColumnSize.Is4">
                 <TextEdit @bind-Text="@YouTubeUrl" />
             </FieldBody>
-            <FieldBody>
+            <FieldBody ColumnSize="ColumnSize.Is1">
                 <Tooltip Text="Process YouTube Video Url (download manifest).">
                     <Button Color="Color.Primary" Disabled="@(!ProcessYouTubeUrlButtonEnabled)" Loading="@(!ProcessYouTubeUrlButtonEnabled)" Clicked="@ProcessYouTubeUrlAsync">Process</Button>
                 </Tooltip>

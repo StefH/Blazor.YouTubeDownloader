@@ -1,6 +1,6 @@
 ﻿using YoutubeExplode.Videos.Streams;
 
-namespace Blazor.YouTubeDownloader.Extensions;
+namespace YoutubeExplode.DemoConsole.Extensions;
 
 internal static class AudioOnlyStreamInfoExtensions
 {
