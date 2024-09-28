@@ -1,12 +1,13 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Web;
 using Matroska.Muxer;
-using YouTubeDownloader.WinFormsApp.Extensions;
+using YouTubeAudioDownloader.App.Extensions;
 using YoutubeExplode;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
-namespace YouTubeDownloader.WinFormsApp;
+namespace YouTubeAudioDownloader.App;
 
 public partial class Main : Form
 {
@@ -28,6 +29,7 @@ public partial class Main : Form
 
     private async void btnDownloadManifest_Click(object sender, EventArgs e)
     {
+        ClearPanel();
         txtYouTubeUrl.Enabled = false;
         btnDownloadManifest.Enabled = false;
         btnDownload.Enabled = false;
@@ -44,7 +46,7 @@ public partial class Main : Form
             _videoMetaData = await videoMetaDataTask;
             _videoStreams = await videoStreamsTask;
 
-            _audioOnlyStreamInfos = _videoStreams.GetAudioOnlyStreams().ToArray();
+            _audioOnlyStreamInfos = _videoStreams.GetAudioOnlyStreams().Distinct().ToArray();
             _highestAudioStreamInfo = _audioOnlyStreamInfos.TryGetWithHighestBitrate() as AudioOnlyStreamInfo;
             _selectedAudioStreamInfo = _highestAudioStreamInfo;
 
@@ -68,6 +70,7 @@ public partial class Main : Form
         }
 
         btnDownload.Enabled = false;
+        progressBar.Value = 0;
 
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         try
@@ -75,18 +78,22 @@ public partial class Main : Form
             var filename = GetFileNameWithExtension(_selectedAudioStreamInfo);
             var path = Path.Combine(folder, filename);
 
-            var fileStream = new FileStream(path, FileMode.OpenOrCreate);
+            await using var fileStream = new FileStream(path, FileMode.OpenOrCreate);
             if (_selectedAudioStreamInfo.IsOpus() && ExtractOpus)
             {
+                Debug.WriteLine(DateTime.Now);
                 using var destinationStream = new MemoryStream();
-                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, destinationStream);
+                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, destinationStream, new DownloadProgress(this, 80));
                 destinationStream.Position = 0;
 
+                Debug.WriteLine(DateTime.Now);
                 MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, fileStream);
+                progressBar.Value = 100;
+                Debug.WriteLine(DateTime.Now);
             }
             else
             {
-                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, fileStream);
+                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, fileStream, new DownloadProgress(this));
             }
         }
         finally
@@ -98,16 +105,7 @@ public partial class Main : Form
 
     private void GenerateAudioStreamRadioButtons()
     {
-        // Unsubscribe from CheckedChanged event for existing radio buttons
-        foreach (Control control in panelAudioStreams.Controls)
-        {
-            if (control is RadioButton radioButton)
-            {
-                radioButton.CheckedChanged -= RadioButton_CheckedChanged;
-            }
-        }
-        // Clear the panel controls
-        panelAudioStreams.Controls.Clear();
+        ClearPanel();
 
         var yOffset = 10;
 
@@ -118,7 +116,7 @@ public partial class Main : Form
             {
                 Text = audioStream.GetTitle(),
                 Tag = audioStream,
-                Location = new Point(0, yOffset),
+                Location = new Point(5, yOffset),
                 AutoSize = true,
                 Checked = audioStream.Url == _highestAudioStreamInfo?.Url
             };
@@ -127,6 +125,17 @@ public partial class Main : Form
             panelAudioStreams.Controls.Add(radioButton);
             yOffset += 45;
         }
+    }
+
+    private void ClearPanel()
+    {
+        // Unsubscribe from CheckedChanged event for existing radio buttons
+        foreach (var radioButton in panelAudioStreams.Controls.OfType<RadioButton>())
+        {
+            radioButton.CheckedChanged -= RadioButton_CheckedChanged;
+        }
+        // Clear the panel controls
+        panelAudioStreams.Controls.Clear();
     }
 
     private void RadioButton_CheckedChanged(object? sender, EventArgs e)
@@ -149,5 +158,18 @@ public partial class Main : Form
     private static string GetSafeFileName(string fileName)
     {
         return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
+    }
+
+    private class DownloadProgress(Main main, double max = 100) : IProgress<double>
+    {
+        public void Report(double value)
+        {
+            main.progressBar.Value = Math.Clamp((int)(value * 100 * (max / 100)), 0, 100);
+        }
+    }
+
+    private void progressBar_Click(object sender, EventArgs e)
+    {
+
     }
 }

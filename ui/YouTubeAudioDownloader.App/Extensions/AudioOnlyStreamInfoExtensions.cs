@@ -1,6 +1,6 @@
 ﻿using YoutubeExplode.Videos.Streams;
 
-namespace YouTubeDownloader.WinFormsApp.Extensions;
+namespace YouTubeAudioDownloader.App.Extensions;
 
 internal static class AudioOnlyStreamInfoExtensions
 {

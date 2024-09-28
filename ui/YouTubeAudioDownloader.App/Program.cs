@@ -1,4 +1,4 @@
-namespace YouTubeDownloader.WinFormsApp
+namespace YouTubeAudioDownloader.App
 {
     internal static class Program
     {
