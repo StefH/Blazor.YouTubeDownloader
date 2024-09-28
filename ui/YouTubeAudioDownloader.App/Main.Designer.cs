@@ -34,12 +34,14 @@
             panelAudioStreams = new Panel();
             lblInfo = new Label();
             progressBar = new ProgressBar();
+            lblYouTubeUrl = new Label();
+            lblAudioStreams = new Label();
             SuspendLayout();
             // 
             // btnDownloadManifest
             // 
             btnDownloadManifest.Font = new Font("Segoe UI", 15F);
-            btnDownloadManifest.Location = new Point(935, 107);
+            btnDownloadManifest.Location = new Point(935, 70);
             btnDownloadManifest.Margin = new Padding(5);
             btnDownloadManifest.Name = "btnDownloadManifest";
             btnDownloadManifest.Size = new Size(200, 47);
@@ -51,7 +53,7 @@
             // txtYouTubeUrl
             // 
             txtYouTubeUrl.Font = new Font("Segoe UI", 15F);
-            txtYouTubeUrl.Location = new Point(76, 107);
+            txtYouTubeUrl.Location = new Point(70, 70);
             txtYouTubeUrl.Margin = new Padding(5);
             txtYouTubeUrl.Name = "txtYouTubeUrl";
             txtYouTubeUrl.Size = new Size(800, 47);
@@ -62,7 +64,7 @@
             // 
             btnDownload.Enabled = false;
             btnDownload.Font = new Font("Segoe UI", 15F);
-            btnDownload.Location = new Point(935, 858);
+            btnDownload.Location = new Point(935, 820);
             btnDownload.Margin = new Padding(5);
             btnDownload.Name = "btnDownload";
             btnDownload.Size = new Size(200, 47);
@@ -75,17 +77,17 @@
             // 
             panelAudioStreams.BorderStyle = BorderStyle.FixedSingle;
             panelAudioStreams.Font = new Font("Segoe UI", 15F);
-            panelAudioStreams.Location = new Point(76, 196);
+            panelAudioStreams.Location = new Point(70, 214);
             panelAudioStreams.Margin = new Padding(5);
             panelAudioStreams.Name = "panelAudioStreams";
-            panelAudioStreams.Size = new Size(800, 600);
+            panelAudioStreams.Size = new Size(800, 555);
             panelAudioStreams.TabIndex = 3;
             // 
             // lblInfo
             // 
             lblInfo.AutoSize = true;
             lblInfo.Font = new Font("Segoe UI", 15F);
-            lblInfo.Location = new Point(76, 920);
+            lblInfo.Location = new Point(70, 880);
             lblInfo.Margin = new Padding(5, 0, 5, 0);
             lblInfo.Name = "lblInfo";
             lblInfo.Size = new Size(0, 41);
@@ -93,18 +95,38 @@
             // 
             // progressBar
             // 
-            progressBar.Location = new Point(76, 858);
+            progressBar.Location = new Point(70, 820);
             progressBar.Margin = new Padding(5);
             progressBar.Name = "progressBar";
             progressBar.Size = new Size(800, 42);
             progressBar.TabIndex = 5;
             progressBar.Click += progressBar_Click;
             // 
+            // lblYouTubeUrl
+            // 
+            lblYouTubeUrl.AutoSize = true;
+            lblYouTubeUrl.Location = new Point(70, 24);
+            lblYouTubeUrl.Name = "lblYouTubeUrl";
+            lblYouTubeUrl.Size = new Size(266, 41);
+            lblYouTubeUrl.TabIndex = 6;
+            lblYouTubeUrl.Text = "YouTube Video Url";
+            // 
+            // lblAudioStreams
+            // 
+            lblAudioStreams.AutoSize = true;
+            lblAudioStreams.Location = new Point(70, 168);
+            lblAudioStreams.Name = "lblAudioStreams";
+            lblAudioStreams.Size = new Size(210, 41);
+            lblAudioStreams.TabIndex = 7;
+            lblAudioStreams.Text = "Audio Streams";
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(17F, 41F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1209, 1018);
+            ClientSize = new Size(1209, 942);
+            Controls.Add(lblAudioStreams);
+            Controls.Add(lblYouTubeUrl);
             Controls.Add(progressBar);
             Controls.Add(lblInfo);
             Controls.Add(panelAudioStreams);
@@ -127,5 +149,7 @@
         private Panel panelAudioStreams;
         private Label lblInfo;
         private ProgressBar progressBar;
+        private Label lblYouTubeUrl;
+        private Label lblAudioStreams;
     }
 }

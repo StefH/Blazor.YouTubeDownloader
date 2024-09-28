@@ -69,6 +69,8 @@ public partial class Main : Form
             return;
         }
 
+        txtYouTubeUrl.Enabled = false;
+        btnDownloadManifest.Enabled = false;
         btnDownload.Enabled = false;
         progressBar.Value = 0;
 
@@ -88,18 +90,23 @@ public partial class Main : Form
 
                 Debug.WriteLine(DateTime.Now);
                 MatroskaDemuxer.ExtractOggOpusAudio(destinationStream, fileStream);
-                progressBar.Value = 100;
                 Debug.WriteLine(DateTime.Now);
             }
             else
             {
+                Debug.WriteLine(DateTime.Now);
                 await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, fileStream, new DownloadProgress(this));
+                Debug.WriteLine(DateTime.Now);
             }
         }
         finally
         {
+            progressBar.Value = 100;
+
             lblInfo.Text = $"File saved to '{folder}'.";
             btnDownload.Enabled = true;
+            txtYouTubeUrl.Enabled = true;
+            btnDownloadManifest.Enabled = true;
         }
     }
 
