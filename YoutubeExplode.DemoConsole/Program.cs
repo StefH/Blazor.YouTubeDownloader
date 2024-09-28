@@ -4,9 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Web;
 using Matroska.Muxer;
-using YoutubeExplode.DemoConsole.Extensions;
 using YoutubeExplode.Videos;
 using YoutubeExplode.Videos.Streams;
 
