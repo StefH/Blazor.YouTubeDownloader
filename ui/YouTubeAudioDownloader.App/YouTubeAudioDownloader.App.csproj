@@ -6,7 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationIcon>youtube 64x64.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="youtube 64x64.ico" />
+  </ItemGroup>
 
   <ItemGroup>
 	  <PackageReference Include="Matroska.Muxer" Version="0.0.9" />

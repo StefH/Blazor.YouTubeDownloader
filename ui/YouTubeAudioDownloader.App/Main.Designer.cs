@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             btnDownloadManifest = new Button();
             txtYouTubeUrl = new TextBox();
             btnDownload = new Button();
@@ -134,6 +135,7 @@
             Controls.Add(txtYouTubeUrl);
             Controls.Add(btnDownloadManifest);
             Font = new Font("Segoe UI", 15F);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Margin = new Padding(5);
             Name = "Main";
             Text = "YouTube Audio Downloader";
