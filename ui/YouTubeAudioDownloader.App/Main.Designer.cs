@@ -37,6 +37,7 @@
             progressBar = new ProgressBar();
             lblYouTubeUrl = new Label();
             lblAudioStreams = new Label();
+            lblTitle = new Label();
             SuspendLayout();
             // 
             // btnDownloadManifest
@@ -65,7 +66,7 @@
             // 
             btnDownload.Enabled = false;
             btnDownload.Font = new Font("Segoe UI", 15F);
-            btnDownload.Location = new Point(935, 820);
+            btnDownload.Location = new Point(935, 901);
             btnDownload.Margin = new Padding(5);
             btnDownload.Name = "btnDownload";
             btnDownload.Size = new Size(200, 47);
@@ -78,7 +79,7 @@
             // 
             panelAudioStreams.BorderStyle = BorderStyle.FixedSingle;
             panelAudioStreams.Font = new Font("Segoe UI", 15F);
-            panelAudioStreams.Location = new Point(70, 214);
+            panelAudioStreams.Location = new Point(70, 295);
             panelAudioStreams.Margin = new Padding(5);
             panelAudioStreams.Name = "panelAudioStreams";
             panelAudioStreams.Size = new Size(800, 555);
@@ -88,15 +89,16 @@
             // 
             lblInfo.AutoSize = true;
             lblInfo.Font = new Font("Segoe UI", 15F);
-            lblInfo.Location = new Point(70, 880);
+            lblInfo.Location = new Point(70, 961);
             lblInfo.Margin = new Padding(5, 0, 5, 0);
             lblInfo.Name = "lblInfo";
-            lblInfo.Size = new Size(0, 41);
+            lblInfo.Size = new Size(91, 41);
             lblInfo.TabIndex = 4;
+            lblInfo.Text = "Info...";
             // 
             // progressBar
             // 
-            progressBar.Location = new Point(70, 820);
+            progressBar.Location = new Point(70, 901);
             progressBar.Margin = new Padding(5);
             progressBar.Name = "progressBar";
             progressBar.Size = new Size(800, 42);
@@ -115,17 +117,27 @@
             // lblAudioStreams
             // 
             lblAudioStreams.AutoSize = true;
-            lblAudioStreams.Location = new Point(70, 168);
+            lblAudioStreams.Location = new Point(70, 249);
             lblAudioStreams.Name = "lblAudioStreams";
             lblAudioStreams.Size = new Size(210, 41);
             lblAudioStreams.TabIndex = 7;
             lblAudioStreams.Text = "Audio Streams";
             // 
+            // lblTitle
+            // 
+            lblTitle.AutoSize = true;
+            lblTitle.Location = new Point(70, 159);
+            lblTitle.Name = "lblTitle";
+            lblTitle.Size = new Size(95, 41);
+            lblTitle.TabIndex = 8;
+            lblTitle.Text = "Title...";
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(17F, 41F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1209, 942);
+            ClientSize = new Size(1209, 1019);
+            Controls.Add(lblTitle);
             Controls.Add(lblAudioStreams);
             Controls.Add(lblYouTubeUrl);
             Controls.Add(progressBar);
@@ -153,5 +165,6 @@
         private ProgressBar progressBar;
         private Label lblYouTubeUrl;
         private Label lblAudioStreams;
+        private Label lblTitle;
     }
 }

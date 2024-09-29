@@ -16,6 +16,7 @@ public partial class Main : Form
     private readonly YoutubeClient _youtubeClient = new();
 
     private string _youTubeUrl = string.Empty;
+    private string _title = string.Empty;
     private StreamManifest? _videoStreams;
     private IEnumerable<AudioOnlyStreamInfo> _audioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
     private AudioOnlyStreamInfo? _highestAudioStreamInfo;
@@ -25,11 +26,15 @@ public partial class Main : Form
     public Main()
     {
         InitializeComponent();
+
+        lblTitle.Text = string.Empty;
+        lblInfo.Text = string.Empty;
     }
 
     private async void btnDownloadManifest_Click(object sender, EventArgs e)
     {
         ClearPanel();
+        _title = string.Empty;
         txtYouTubeUrl.Enabled = false;
         btnDownloadManifest.Enabled = false;
         btnDownload.Enabled = false;
@@ -46,6 +51,7 @@ public partial class Main : Form
             _videoMetaData = await videoMetaDataTask;
             _videoStreams = await videoStreamsTask;
 
+            _title = _videoMetaData.Title;
             _audioOnlyStreamInfos = _videoStreams.GetAudioOnlyStreams().Distinct().ToArray();
             _highestAudioStreamInfo = _audioOnlyStreamInfos.TryGetWithHighestBitrate() as AudioOnlyStreamInfo;
             _selectedAudioStreamInfo = _highestAudioStreamInfo;
@@ -54,6 +60,7 @@ public partial class Main : Form
         }
         finally
         {
+            lblTitle.Text = _title;
             txtYouTubeUrl.Enabled = true;
             btnDownloadManifest.Enabled = true;
             btnDownload.Enabled = true;
@@ -157,7 +164,7 @@ public partial class Main : Form
     {
         var extension = streamInfo.IsOpus() && ExtractOpus ? "opus" : streamInfo.Container.Name;
 
-        var fileName = GetSafeFileName(_videoMetaData?.Title ?? HttpUtility.ParseQueryString(new Uri(_youTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
+        var fileName = GetSafeFileName(_title ?? HttpUtility.ParseQueryString(new Uri(_youTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
         return $"{fileName}.{extension}";
     }
