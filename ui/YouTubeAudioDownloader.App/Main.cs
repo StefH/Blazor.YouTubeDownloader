@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.DirectoryServices.ActiveDirectory;
 using System.Text.RegularExpressions;
 using System.Web;
 using Matroska.Muxer;
@@ -18,13 +17,12 @@ public partial class Main : Form
     private readonly YoutubeClient _youtubeClient = new();
 
     private string _youTubeUrl = string.Empty;
-    private string _title = string.Empty;
-    private StreamManifest? _videoStreams;
-    private IEnumerable<AudioOnlyStreamInfo> _audioOnlyStreamInfos = Array.Empty<AudioOnlyStreamInfo>();
-    private AudioOnlyStreamInfo? _highestAudioStreamInfo;
-    private AudioOnlyStreamInfo? _selectedAudioStreamInfo;
+    private string? _title;
+    private IEnumerable<AudioOnlyStreamInfo> _audioOnlyStreams = Array.Empty<AudioOnlyStreamInfo>();
+    private AudioOnlyStreamInfo? _highestAudioStream;
+    private AudioOnlyStreamInfo? _selectedAudioStream;
     private Video? _videoMetaData;
-    
+
 
     public Main()
     {
@@ -52,18 +50,29 @@ public partial class Main : Form
 
         try
         {
-            var videoMetaDataTask = _youtubeClient.Videos.GetAsync(_youTubeUrl).AsTask();
-            var videoStreamsTask = _youtubeClient.Videos.Streams.GetManifestAsync(_youTubeUrl).AsTask();
+            var audioStreamsTask = Task.Run(async () =>
+            {
+                // Try multiple times to download the manifest to get all available audio streams
+                var videoStreamsTasks = Enumerable.Range(0, 4)
+                    .Select(_ => _youtubeClient.Videos.Streams.GetManifestAsync(_youTubeUrl).AsTask());
 
-            await Task.WhenAll(videoMetaDataTask, videoStreamsTask);
+                var streamManifests = await Task.WhenAll(videoStreamsTasks);
+
+                return streamManifests
+                    .SelectMany(s => s.GetAudioOnlyStreams())
+                    .DistinctBy(s => s.GetTitle())
+                    .ToArray();
+            });
+            var videoMetaDataTask = _youtubeClient.Videos.GetAsync(_youTubeUrl).AsTask();
+
+            await Task.WhenAll(audioStreamsTask, videoMetaDataTask);
 
             _videoMetaData = await videoMetaDataTask;
-            _videoStreams = await videoStreamsTask;
-
             _title = _videoMetaData.Title;
-            _audioOnlyStreamInfos = _videoStreams.GetAudioOnlyStreams().Distinct().ToArray();
-            _highestAudioStreamInfo = _audioOnlyStreamInfos.TryGetWithHighestBitrate() as AudioOnlyStreamInfo;
-            _selectedAudioStreamInfo = _highestAudioStreamInfo;
+
+            _audioOnlyStreams = await audioStreamsTask;
+            _highestAudioStream = _audioOnlyStreams.TryGetWithHighestBitrate() as AudioOnlyStreamInfo;
+            _selectedAudioStream = _highestAudioStream;
 
             GenerateAudioStreamRadioButtons();
         }
@@ -76,7 +85,7 @@ public partial class Main : Form
 
     private async void btnDownload_Click(object sender, EventArgs e)
     {
-        if (_selectedAudioStreamInfo == null)
+        if (_selectedAudioStream == null)
         {
             lblInfo.Text = "Please select an audio stream to download.";
             return;
@@ -87,15 +96,15 @@ public partial class Main : Form
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         try
         {
-            var filename = GetFileNameWithExtension(_selectedAudioStreamInfo);
+            var filename = GetFileNameWithExtension(_selectedAudioStream);
             var path = Path.Combine(folder, filename);
 
             await using var fileStream = new FileStream(path, FileMode.OpenOrCreate);
-            if (_selectedAudioStreamInfo.IsOpus() && ExtractOpus)
+            if (_selectedAudioStream.IsOpus() && ExtractOpus)
             {
                 Debug.WriteLine(DateTime.Now);
                 using var destinationStream = new MemoryStream();
-                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, destinationStream, new DownloadProgress(this, 80));
+                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStream, destinationStream, new DownloadProgress(this, 80));
                 destinationStream.Position = 0;
 
                 Debug.WriteLine(DateTime.Now);
@@ -105,7 +114,7 @@ public partial class Main : Form
             else
             {
                 Debug.WriteLine(DateTime.Now);
-                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStreamInfo, fileStream, new DownloadProgress(this));
+                await _youtubeClient.Videos.Streams.CopyToAsync(_selectedAudioStream, fileStream, new DownloadProgress(this));
                 Debug.WriteLine(DateTime.Now);
             }
         }
@@ -123,7 +132,7 @@ public partial class Main : Form
         var yOffset = 10;
 
         // Generate new radio buttons based on _audioOnlyStreamInfos
-        foreach (var audioStream in _audioOnlyStreamInfos.DistinctBy(a => a.GetTitle()))
+        foreach (var audioStream in _audioOnlyStreams)
         {
             var radioButton = new RadioButton
             {
@@ -131,7 +140,7 @@ public partial class Main : Form
                 Tag = audioStream,
                 Location = new Point(5, yOffset),
                 AutoSize = true,
-                Checked = audioStream.Url == _highestAudioStreamInfo?.Url
+                Checked = audioStream.Url == _highestAudioStream?.Url
             };
 
             radioButton.CheckedChanged += RadioButton_CheckedChanged;
@@ -139,12 +148,12 @@ public partial class Main : Form
             yOffset += 45;
         }
     }
-    
+
     private void RadioButton_CheckedChanged(object? sender, EventArgs e)
     {
         if (sender is RadioButton { Checked: true } radioButton)
         {
-            _selectedAudioStreamInfo = radioButton.Tag as AudioOnlyStreamInfo;
+            _selectedAudioStream = radioButton.Tag as AudioOnlyStreamInfo;
         }
     }
 
@@ -154,7 +163,7 @@ public partial class Main : Form
 
         var fileName = GetSafeFileName(_title ?? HttpUtility.ParseQueryString(new Uri(_youTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
-        return $"{fileName}.{extension}";
+        return $"{fileName} ({streamInfo.GetCodecAndBitrate()}).{extension}";
     }
 
     private static string GetSafeFileName(string fileName)

@@ -8,7 +8,12 @@ internal static class AudioOnlyStreamInfoExtensions
 
     public static string GetTitle(this AudioOnlyStreamInfo info)
     {
-        return $"{info.Container.Name} - {info.AudioCodec} - {info.Bitrate} - ({info.Size})";
+        return $"{info.Container.Name} - {info.AudioCodec} - {Math.Round(info.Bitrate.KiloBitsPerSecond, 0)} kbps - ({Math.Round(info.Size.MegaBytes, 2)} MB)";
+    }
+
+    public static string GetCodecAndBitrate(this AudioOnlyStreamInfo info)
+    {
+        return $"{info.AudioCodec} - {Math.Round(info.Bitrate.KiloBitsPerSecond, 0)} kbps)";
     }
 
     public static bool IsOpus(this AudioOnlyStreamInfo info)
