@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.DirectoryServices.ActiveDirectory;
 using System.Text.RegularExpressions;
 using System.Web;
 using Matroska.Muxer;
@@ -13,6 +14,7 @@ public partial class Main : Form
 {
     private const bool ExtractOpus = true;
 
+    private readonly StateMachine _stateMachine;
     private readonly YoutubeClient _youtubeClient = new();
 
     private string _youTubeUrl = string.Empty;
@@ -22,23 +24,30 @@ public partial class Main : Form
     private AudioOnlyStreamInfo? _highestAudioStreamInfo;
     private AudioOnlyStreamInfo? _selectedAudioStreamInfo;
     private Video? _videoMetaData;
+    
 
     public Main()
     {
         InitializeComponent();
 
-        lblTitle.Text = string.Empty;
-        lblInfo.Text = string.Empty;
+        _stateMachine = new StateMachine(this);
+    }
+
+    public void ClearPanel()
+    {
+        // Unsubscribe from CheckedChanged event for existing radio buttons
+        foreach (var radioButton in panelAudioStreams.Controls.OfType<RadioButton>())
+        {
+            radioButton.CheckedChanged -= RadioButton_CheckedChanged;
+        }
+        // Clear the panel controls
+        panelAudioStreams.Controls.Clear();
     }
 
     private async void btnDownloadManifest_Click(object sender, EventArgs e)
     {
-        ClearPanel();
+        _stateMachine.TransitionToState(State.BeforeDownloadManifest);
         _title = string.Empty;
-        txtYouTubeUrl.Enabled = false;
-        btnDownloadManifest.Enabled = false;
-        btnDownload.Enabled = false;
-
         _youTubeUrl = txtYouTubeUrl.Text;
 
         try
@@ -61,25 +70,19 @@ public partial class Main : Form
         finally
         {
             lblTitle.Text = _title;
-            txtYouTubeUrl.Enabled = true;
-            btnDownloadManifest.Enabled = true;
-            btnDownload.Enabled = true;
+            _stateMachine.TransitionToState(State.AfterDownloadManifest);
         }
     }
 
     private async void btnDownload_Click(object sender, EventArgs e)
     {
-        lblInfo.Text = string.Empty;
         if (_selectedAudioStreamInfo == null)
         {
             lblInfo.Text = "Please select an audio stream to download.";
             return;
         }
 
-        txtYouTubeUrl.Enabled = false;
-        btnDownloadManifest.Enabled = false;
-        btnDownload.Enabled = false;
-        progressBar.Value = 0;
+        _stateMachine.TransitionToState(State.BeforeDownload);
 
         var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         try
@@ -108,12 +111,8 @@ public partial class Main : Form
         }
         finally
         {
-            progressBar.Value = 100;
-
+            _stateMachine.TransitionToState(State.AfterDownload);
             lblInfo.Text = $"File saved to '{folder}'.";
-            btnDownload.Enabled = true;
-            txtYouTubeUrl.Enabled = true;
-            btnDownloadManifest.Enabled = true;
         }
     }
 
@@ -140,18 +139,7 @@ public partial class Main : Form
             yOffset += 45;
         }
     }
-
-    private void ClearPanel()
-    {
-        // Unsubscribe from CheckedChanged event for existing radio buttons
-        foreach (var radioButton in panelAudioStreams.Controls.OfType<RadioButton>())
-        {
-            radioButton.CheckedChanged -= RadioButton_CheckedChanged;
-        }
-        // Clear the panel controls
-        panelAudioStreams.Controls.Clear();
-    }
-
+    
     private void RadioButton_CheckedChanged(object? sender, EventArgs e)
     {
         if (sender is RadioButton { Checked: true } radioButton)

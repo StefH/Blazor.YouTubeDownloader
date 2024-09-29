@@ -46,9 +46,9 @@
             btnDownloadManifest.Location = new Point(935, 70);
             btnDownloadManifest.Margin = new Padding(5);
             btnDownloadManifest.Name = "btnDownloadManifest";
-            btnDownloadManifest.Size = new Size(200, 47);
+            btnDownloadManifest.Size = new Size(300, 49);
             btnDownloadManifest.TabIndex = 0;
-            btnDownloadManifest.Text = "Process";
+            btnDownloadManifest.Text = "Download Manifest";
             btnDownloadManifest.UseVisualStyleBackColor = true;
             btnDownloadManifest.Click += btnDownloadManifest_Click;
             // 
@@ -69,9 +69,9 @@
             btnDownload.Location = new Point(935, 901);
             btnDownload.Margin = new Padding(5);
             btnDownload.Name = "btnDownload";
-            btnDownload.Size = new Size(200, 47);
+            btnDownload.Size = new Size(300, 49);
             btnDownload.TabIndex = 2;
-            btnDownload.Text = "Download";
+            btnDownload.Text = "Download Audio";
             btnDownload.UseVisualStyleBackColor = true;
             btnDownload.Click += btnDownload_Click;
             // 
@@ -136,7 +136,7 @@
             // 
             AutoScaleDimensions = new SizeF(17F, 41F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1209, 1019);
+            ClientSize = new Size(1405, 1019);
             Controls.Add(lblTitle);
             Controls.Add(lblAudioStreams);
             Controls.Add(lblYouTubeUrl);
@@ -156,15 +156,14 @@
         }
 
         #endregion
-
-        private Button btnDownloadManifest;
-        private TextBox txtYouTubeUrl;
-        private Button btnDownload;
-        private Panel panelAudioStreams;
-        private Label lblInfo;
-        private ProgressBar progressBar;
-        private Label lblYouTubeUrl;
         private Label lblAudioStreams;
-        private Label lblTitle;
+        public TextBox txtYouTubeUrl;
+        public Panel panelAudioStreams;
+        public Label lblInfo;
+        public ProgressBar progressBar;
+        public Label lblYouTubeUrl;
+        public Label lblTitle;
+        public Button btnDownloadManifest;
+        public Button btnDownload;
     }
 }
