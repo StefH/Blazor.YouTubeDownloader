@@ -34,6 +34,7 @@ public class StateMachine
                 _main.btnDownload.Enabled = false;
                 _main.lblInfo.Text = "Downloading manifest...";
                 _main.lblTitle.Text = string.Empty;
+                _main.progressBar.Value = 0;
                 break;
 
             case State.AfterDownloadManifest:
