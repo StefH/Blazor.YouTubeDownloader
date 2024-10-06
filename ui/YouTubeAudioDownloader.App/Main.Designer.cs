@@ -103,7 +103,6 @@
             progressBar.Name = "progressBar";
             progressBar.Size = new Size(800, 42);
             progressBar.TabIndex = 5;
-            progressBar.Click += progressBar_Click;
             // 
             // lblYouTubeUrl
             // 

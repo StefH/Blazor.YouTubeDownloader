@@ -23,7 +23,6 @@ public partial class Main : Form
     private AudioOnlyStreamInfo? _selectedAudioStream;
     private Video? _videoMetaData;
 
-
     public Main()
     {
         InitializeComponent();
@@ -60,7 +59,6 @@ public partial class Main : Form
 
                 return streamManifests
                     .SelectMany(s => s.GetAudioOnlyStreams())
-                    .DistinctBy(s => s.GetTitle())
                     .ToArray();
             });
             var videoMetaDataTask = _youtubeClient.Videos.GetAsync(_youTubeUrl).AsTask();
@@ -71,6 +69,7 @@ public partial class Main : Form
             _title = _videoMetaData.Title;
 
             _audioOnlyStreams = await audioStreamsTask;
+            _audioOnlyStreams = SelectHighestBitrateStreams(_audioOnlyStreams);
             _highestAudioStream = _audioOnlyStreams.TryGetWithHighestBitrate() as AudioOnlyStreamInfo;
             _selectedAudioStream = _highestAudioStream;
 
@@ -179,8 +178,22 @@ public partial class Main : Form
         }
     }
 
-    private void progressBar_Click(object sender, EventArgs e)
+    private static AudioOnlyStreamInfo[] SelectHighestBitrateStreams(IEnumerable<AudioOnlyStreamInfo> streams)
     {
+        var groupedStreams = streams.GroupBy(s => s.GetContainerAndAudioCodec());
 
+        var selectedStreams = new List<AudioOnlyStreamInfo>();
+
+        foreach (var group in groupedStreams)
+        {
+            var maxBitrateStream = group.OrderByDescending(s => s.Bitrate.BitsPerSecond).First();
+            var maxBitrate = maxBitrateStream.Bitrate.BitsPerSecond;
+
+            var within10Percent = group.Where(s => s.Bitrate.BitsPerSecond >= maxBitrate * 0.9).ToList();
+
+            selectedStreams.Add(within10Percent.OrderByDescending(s => s.Bitrate.BitsPerSecond).First());
+        }
+
+        return selectedStreams.ToArray();
     }
 }
