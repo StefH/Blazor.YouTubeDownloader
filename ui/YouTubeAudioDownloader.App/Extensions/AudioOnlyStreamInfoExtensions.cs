@@ -18,7 +18,7 @@ internal static class AudioOnlyStreamInfoExtensions
 
     public static string GetCodecAndBitrate(this AudioOnlyStreamInfo info)
     {
-        return $"{info.AudioCodec} - {Math.Round(info.Bitrate.KiloBitsPerSecond, 0)} kbps)";
+        return $"{info.AudioCodec} - {Math.Round(info.Bitrate.KiloBitsPerSecond, 0)} kbps";
     }
 
     public static bool IsOpus(this AudioOnlyStreamInfo info)
