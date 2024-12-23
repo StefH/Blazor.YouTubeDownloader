@@ -162,7 +162,8 @@ public partial class Main : Form
 
         var fileName = GetSafeFileName(_title ?? HttpUtility.ParseQueryString(new Uri(_youTubeUrl).Query)["v"] ?? Path.GetRandomFileName());
 
-        return $"{fileName} ({streamInfo.GetCodecAndBitrate()}).{extension}";
+        //  ({streamInfo.GetCodecAndBitrate()})
+        return $"{fileName}.{extension}";
     }
 
     private static string GetSafeFileName(string fileName)

@@ -1,4 +1,4 @@
-using YouTubeAudioDownloader.App;
+namespace YouTubeAudioDownloader.App;
 
 public class StateMachine
 {
