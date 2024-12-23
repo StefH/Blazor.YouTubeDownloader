@@ -187,6 +187,6 @@ public partial class Index
 
     private static string GetSafeFileName(string fileName)
     {
-        return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidPathChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
+        return Regex.Replace(fileName, "[" + Regex.Escape(new string(Path.GetInvalidFileNameChars())) + "]", string.Empty, RegexOptions.IgnoreCase);
     }
 }
