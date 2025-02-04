@@ -17,7 +17,7 @@
     <PackageReference Include="Jurassic" Version="3.2.4" />
     <PackageReference Include="Stef.Validation" Version="0.1.1" />
     <PackageReference Include="ExposedObject" Version="2.2.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.5.1" />
+    <PackageReference Include="YoutubeExplode" Version="6.5.3" />
   </ItemGroup>
 
 </Project>
