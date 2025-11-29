@@ -15,7 +15,7 @@
 
   <ItemGroup>
 	  <PackageReference Include="Matroska.Muxer" Version="0.0.12" />
-	  <PackageReference Include="YoutubeExplode" Version="6.5.4" />
+	  <PackageReference Include="YoutubeExplode" Version="6.5.6" />
   </ItemGroup>
 
 </Project>
