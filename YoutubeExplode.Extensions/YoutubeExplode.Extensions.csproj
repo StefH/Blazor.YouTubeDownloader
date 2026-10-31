@@ -15,9 +15,9 @@
   <ItemGroup>
     <PackageReference Include="Flurl" Version="4.0.0" />
     <PackageReference Include="Jurassic" Version="3.2.9" />
-    <PackageReference Include="Stef.Validation" Version="0.2.0" />
+    <PackageReference Include="Stef.Validation" Version="0.3.0" />
     <PackageReference Include="ExposedObject" Version="2.2.0" />
-    <PackageReference Include="YoutubeExplode" Version="6.5.7" />
+    <PackageReference Include="YoutubeExplode" Version="6.6.3" />
   </ItemGroup>
 
 </Project>
